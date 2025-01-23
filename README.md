@@ -1,4 +1,4 @@
-# PROJECT1-SEC-1-ClickerGame
+# PROJECT1-SEC-1-24Game
 
 ## รายชื่อ
 - 66130500004 ก้องภพ กองแสน
