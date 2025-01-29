@@ -12,7 +12,6 @@ const generateNumbers = () => {
   for(let i = 0; i < 4; i++){
     numbers.value.push(Math.floor(Math.random() * 9)+1)
   }
-  numbers.value = ''
   selectedNumbers.value = []
   message.value = ''
 }
@@ -44,14 +43,15 @@ const checkResult = () => {
   }
 }
 
-const selectNumbers = (index)=> {
-  if(selectedNumbers.value.includes(index)){
-    message.value("You already selected this number")
-    return
+const selectNumber = (index) => {
+  if (selectedNumbers.value.includes(index)) {
+    message.value = 'You already selected this number.';
+    return;
   }
-  selectedNumbers.value.push(index)
-  equation.value += numbers.value[i]
-} 
+  selectedNumbers.value.push(index);
+  equation.value += numbers.value[index];
+};
+ 
 
 const newGame = () => {
   generateNumbers()
@@ -77,25 +77,64 @@ onMounted(() => {
     <div class="bg-white shadow-md rounded-lg p-6 max-w-lg w-full">
       <h1 class="text-3xl font-bold text-center mb-6">Game 24</h1>
 
-      <!-- show generate numbers -->
-       <div>
-            
-       </div>
+      <!-- Display Random Numbers -->
+      <div class="flex justify-center gap-4 mb-4">
+        <button
+          v-for="(num, index) in numbers"
+          :key="index"
+          class="px-4 py-2 text-lg font-semibold bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-600"
+          :class="{ 'bg-green-500': selectedNumbers.includes(index) }"
+          @click="selectNumber(index)"
+        >
+          {{ num }}
+        </button>
+      </div>
 
-       <!-- show button -->
-        <div class="flex justify-center items-centers gap-4 mb-4">
-          <button>+</button>
-          <button>-</button>
-          <button>*</button>
-          <button>/</button>
-          <button></button>
-          <button></button>
-        </div>
-        <div class="flex justify-center items-center gap-4 mb-4">
-            <button class="text-lg bg-red-500 p-3 font-mono rounded-lg">Clear</button>
-            <button class="text-lg bg-green-500 p-3 font-mono rounded-lg">Check</button>
-            <button class="text-lg bg-blue-500 p-3 font-mono rounded-lg">New Game</button>
-        </div>
+      <!-- Display Equation -->
+      <div class="text-center text-xl font-mono mb-4">
+        <p>
+          Equation: <span class="text-gray-500">{{ equation }}</span>
+        </p>
+      </div>
+
+      <!-- Operator Buttons -->
+      <div class="flex flex-wrap justify-center gap-4 mb-4">
+        <button @click="addOperator('+')" class="btn">+</button>
+        <button @click="addOperator('-')" class="btn">-</button>
+        <button @click="addOperator('*')" class="btn">×</button>
+        <button @click="addOperator('/')" class="btn">÷</button>
+        <button @click="addParenthesis('(')" class="btn">(</button>
+        <button @click="addParenthesis(')')" class="btn">)</button>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-center gap-4">
+        <button
+          @click="clear"
+          class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+        >
+          Clear
+        </button>
+        <button
+          @click="checkResult"
+          class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+        >
+          Check
+        </button>
+        <button
+          @click="newGame"
+          class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        >
+          New Game
+        </button>
+      </div>
+
+      <!-- Feedback Message -->
+      <div class="text-center mt-4 text-lg font-semibold">
+        <p :class="message.includes('Correct') ? 'text-green-600' : 'text-red-600'">
+          {{ message }}
+        </p>
+      </div>
     </div>
   </div>
   <!-- Kong End -->
