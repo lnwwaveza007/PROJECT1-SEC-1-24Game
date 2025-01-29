@@ -1,5 +1,65 @@
 <script setup>
 //Kong Start
+import { ref, onMounted } from 'vue';
+
+const numbers = ref([])
+const equation = ref('')
+const message = ref('')
+const selectedNumbers = ref([])
+
+const generateNumbers = () => {
+  numbers.value = []
+  for(let i = 0; i < 4; i++){
+    numbers.value.push(Math.floor(Math.random() * 9)+1)
+  }
+  numbers.value = ''
+  selectedNumbers.value = []
+  message.value = ''
+}
+
+const addOperator = (operator) => {
+  equation.value += operator
+}
+
+const addParenthesis = (parenthesis) => {
+  equation.value += parenthesis
+}
+
+const clear = () => {
+  equation.value = ''
+  selectedNumbers.value = []
+  message.value = ''
+}
+
+const checkResult = () => {
+  try{
+    const result = eval(equation.value)
+    if(result === 24){
+      message.value("Correct! The result is 24")
+    }else{
+      message.value(`Incorrect The result is ${result}, Please try again`)
+    }
+  }catch{
+    message.value("Invalid equation! Please check your input")
+  }
+}
+
+const selectNumbers = (index)=> {
+  if(selectedNumbers.value.includes(index)){
+    message.value("You already selected this number")
+    return
+  }
+  selectedNumbers.value.push(index)
+  equation.value += numbers.value[i]
+} 
+
+const newGame = () => {
+  generateNumbers()
+}
+
+onMounted(() => {
+  newGame()
+})
 //Kong End
 //Wave Start
 //Wave End
@@ -13,6 +73,31 @@
 
 <template>
   <!-- Kong Start -->
+  <div class="min-h-screen bg-gray-100 flex items-center justify-center font-sans text-gray-800">
+    <div class="bg-white shadow-md rounded-lg p-6 max-w-lg w-full">
+      <h1 class="text-3xl font-bold text-center mb-6">Game 24</h1>
+
+      <!-- show generate numbers -->
+       <div>
+            
+       </div>
+
+       <!-- show button -->
+        <div class="flex justify-center items-centers gap-4 mb-4">
+          <button>+</button>
+          <button>-</button>
+          <button>*</button>
+          <button>/</button>
+          <button></button>
+          <button></button>
+        </div>
+        <div class="flex justify-center items-center gap-4 mb-4">
+            <button class="text-lg bg-red-500 p-3 font-mono rounded-lg">Clear</button>
+            <button class="text-lg bg-green-500 p-3 font-mono rounded-lg">Check</button>
+            <button class="text-lg bg-blue-500 p-3 font-mono rounded-lg">New Game</button>
+        </div>
+    </div>
+  </div>
   <!-- Kong End -->
   <!-- Wave Start -->
   <!-- Wave End -->
