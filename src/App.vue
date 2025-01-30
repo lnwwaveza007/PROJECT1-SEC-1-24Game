@@ -82,7 +82,7 @@ setTimeout(() => {
 
 <template>
   <!-- Kong Start -->
-  <div class="min-h-screen bg-gray-100 flex items-center justify-center font-sans text-gray-800">
+  <div v-bind:hidden="true" class="min-h-screen bg-gray-100 flex items-center justify-center font-sans text-gray-800">
     <div class="bg-white shadow-md rounded-lg p-6 max-w-lg w-full">
       <h1 class="text-3xl font-bold text-center mb-6">Game 24</h1>
 
