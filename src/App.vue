@@ -1,12 +1,53 @@
 <script setup>
 //Kong Start
-import { ref, onMounted } from "vue";
+import { ref, onMounted,computed,watch } from "vue";
 
 const numbers = ref([]);
 const equation = ref("");
-const message = ref("");
 const selectedNumbers = ref([]);
 
+//ตรวจสอบว่าตัวเลขถูกเลือกหรือยัง
+const isSelectedNumbers = computed(() => {
+  return (index) => selectedNumbers.value.includes(index)
+})
+
+//ตรวจสอบสมการว่าถูกต้องไหม
+const isEquationValid = computed(() => {
+  try{
+    eval(equation.value)
+    return selectedNumbers.value.length > 0 // เลือกตัวเลขอย่างน้อย 1 ตัว
+  }catch{
+    return false
+  }
+})
+
+//สร้าง message
+const message = computed(() => {
+  if(selectedNumbers.value.length === 0 && equation.value.length ===0){
+    return "" //start
+  }
+  try{
+    const result = eval(equation.value)
+    if(result === 24){
+      return "Correct! The result is 24!"
+    }else{
+      return `Incorrect your result is ${result} , please try again`
+    }
+  }catch{ 
+    return "Invalid equation! Please check your input"
+  }
+})
+
+// watcher ตรวจสอบ selectedNumbers
+watch(selectedNumbers,(newValue,OldValue) => {
+  if(newValue.length > 4){
+    alert("Error: You can select up to 4 number")
+    selectedNumbers.value = OldValue
+    equation.value = ""
+  }
+}, {
+  deep:true
+})
 const generateNumbers = () => {
   numbers.value = [];
   for (let i = 0; i < 4; i++) {
@@ -29,20 +70,7 @@ const clear = () => {
   selectedNumbers.value = [];
   message.value = "";
 };
-
-const checkResult = () => {
-  try {
-    const result = eval(equation.value);
-    if (result === 24) {
-      message.value("Correct! The result is 24");
-    } else {
-      message.value(`Incorrect The result is ${result}, Please try again`);
-    }
-  } catch {
-    message.value("Invalid equation! Please check your input");
-  }
-};
-
+ 
 const selectNumber = (index) => {
   if (selectedNumbers.value.includes(index)) {
     message.value = "You already selected this number.";
