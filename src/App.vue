@@ -4,6 +4,15 @@
 //Wave Start
 //Wave End
 //Boom Start
+import { lineCreate } from './utils/lineCreate';
+
+setTimeout(() => {
+  const stars = document.getElementById("map").querySelectorAll("img")
+  for (let i = 0; i < stars.length - 1; i++) {
+    lineCreate(stars[i], stars[i + 1]);
+  }
+}, 1000);
+
 //Boom End
 //Chica Start
 //Chica End
@@ -25,10 +34,12 @@
       background-position: center center;
     "
   >
-
+    <!-- SVG -->
+    <svg id="svg">
+    </svg>
 
     <!-- star -->
-    <div class="flex flex-col items-center">
+    <div id="map" class="flex flex-col items-center z-10">
       <img class="w-[8%] ml-[120px]" src="/icons/dimond.png" />
       <img class="w-[20%] ml-[-300px]" src="/icons/star.png" />
       <img class="w-[20%] ml-[100px]" src="/icons/star.png" />
@@ -38,6 +49,7 @@
       <img class="w-[20%] ml-[-150px]" src="/icons/star.png" />
       <img class="w-[20%] ml-[140px]" src="/icons/star.png" />
     </div>
+
   </div>
 
   <!-- Background and FirstStar -->
@@ -62,6 +74,7 @@
   <!-- Chica Start -->
   <!-- Chica End -->
   <!-- Tonpee Start -->
+   
   <!-- Tonpee End -->
 </template>
 
@@ -71,6 +84,14 @@
 /* Wave Start */
 /* Wave End */
 /* Boom Start */
+#svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 /* Boom End */
 /* Chica Start */
 /* Chica End */
