@@ -5,6 +5,19 @@ import { ref, onMounted, computed, watch } from "vue";
 const numbers = ref([]);
 const selectedNumbers = ref([]);
 const message = ref("")
+
+// function ตรวจสอบว่าเกมจะชนะมั้ย
+const isGameWon = computed(() => {
+  return numbers.value.length === 1 && numbers.value[0] === 24
+})
+
+//ใช้ watcher ไว้ตรวจสอบ isGamewon
+watch(isGameWon, (newValue) => {
+  if(newValue){
+    message.value = "Correct , your result is 24"
+  }
+})
+
 // watcher ตรวจสอบ selectedNumbers
  watch(
       selectedNumbers,
@@ -19,7 +32,6 @@ const message = ref("")
       }
     );
 
-    
     const generateNumbers = () => {
       numbers.value = [];
       for (let i = 0; i < 4; i++) {
