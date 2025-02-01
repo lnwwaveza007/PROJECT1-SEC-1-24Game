@@ -65,7 +65,7 @@ const clear = () => {
         if (newValue.length >= 2) {  
           isNumberSelectable.value = false;
         } else {
-          isNumberSelectable.value = true; // ทำให้เลือกได้
+          isNumberSelectable.value = true;
         }
       },
       {
@@ -315,12 +315,16 @@ const starStyles = ref([
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 #svg {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+}
+div{
+  font-family: 'Press Start 2P', sans-serif;
 }
 /* Kong Start */
 /* Kong End */
