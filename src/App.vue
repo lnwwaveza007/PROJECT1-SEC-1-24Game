@@ -1,6 +1,6 @@
 <script setup>
 //Kong Start
-import { ref, onMounted,computed,watch } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 
 const numbers = ref([]);
 const equation = ref("");
@@ -9,46 +9,50 @@ const selectedNumbers = ref([]);
 
 //ตรวจสอบว่าตัวเลขถูกเลือกหรือยัง
 const isSelectedNumbers = computed(() => {
-  return (index) => selectedNumbers.value.includes(index)
-})
+  return (index) => selectedNumbers.value.includes(index);
+});
 
 //ตรวจสอบสมการว่าถูกต้องไหม
 const isEquationValid = computed(() => {
-  try{
-    eval(equation.value)
-    return selectedNumbers.value.length > 0 // เลือกตัวเลขอย่างน้อย 1 ตัว
-  }catch{
-    return false
+  try {
+    eval(equation.value);
+    return selectedNumbers.value.length > 0; // เลือกตัวเลขอย่างน้อย 1 ตัว
+  } catch {
+    return false;
   }
-})
+});
 
 //สร้าง message
 const message = computed(() => {
-  if(selectedNumbers.value.length === 0 && equation.value.length ===0){
-    return "" //start
+  if (selectedNumbers.value.length === 0 && equation.value.length === 0) {
+    return ""; //start
   }
-  try{
-    const result = eval(equation.value)
-    if(result === 24){
-      return "Correct! The result is 24!"
-    }else{
-      return `Incorrect your result is ${result} , please try again`
+  try {
+    const result = eval(equation.value);
+    if (result === 24) {
+      return "Correct! The result is 24!";
+    } else {
+      return `Incorrect your result is ${result} , please try again`;
     }
-  }catch{ 
-    return "Invalid equation! Please check your input"
+  } catch {
+    return "Invalid equation! Please check your input";
   }
-})
+});
 
 // watcher ตรวจสอบ selectedNumbers
-watch(selectedNumbers,(newValue,OldValue) => {
-  if(newValue.length > 4){
-    alert("Error: You can select up to 4 number")
-    selectedNumbers.value = OldValue
-    equation.value = ""
+watch(
+  selectedNumbers,
+  (newValue, OldValue) => {
+    if (newValue.length > 4) {
+      alert("Error: You can select up to 4 number");
+      selectedNumbers.value = OldValue;
+      equation.value = "";
+    }
+  },
+  {
+    deep: true,
   }
-}, {
-  deep:true
-})
+);
 const generateNumbers = () => {
   numbers.value = [];
   for (let i = 0; i < 4; i++) {
@@ -71,7 +75,7 @@ const clear = () => {
   selectedNumbers.value = [];
   message.value = "";
 };
- 
+
 const selectNumber = (index) => {
   if (selectedNumbers.value.includes(index)) {
     message.value = "You already selected this number.";
@@ -96,7 +100,7 @@ const isTransitioning = ref(false);
 
 const scenes = [
   { id: 0, name: "Main Game" },
-  { id: 1, name: "Scene 2" },
+  { id: 1, name: "Level Up" },
 ];
 
 const changeScene = (id) => {
@@ -114,15 +118,18 @@ const changeScene = (id) => {
 };
 //Wave End
 //Boom Start
-import { ref } from "vue";
 import { lineCreate } from "./utils/lineCreate";
 
-setTimeout(() => {
-  const stars = document.getElementById("map").querySelectorAll("img");
-  for (let i = 0; i < stars.length - 1; i++) {
-    lineCreate(stars[i], stars[i + 1]);
-  }
-}, 1000);
+watch(currentScene, (newValue) => {
+  if (newValue !== 1) return;
+  document.getElementById("svg").style.zIndex = 15;
+  setTimeout(() => {
+    const stars = document.getElementById("map").querySelectorAll("img");
+    for (let i = 0; i < stars.length - 1; i++) {
+      lineCreate(stars[i], stars[i + 1]);
+    }
+  }, 500);
+});
 
 function move(event) {
   console.log("move");
@@ -164,6 +171,7 @@ const starStyles = ref([
     </button>
   </div>
   <!-- Kong Start -->
+  <div v-bind:hidden="currentScene !== 0">
     <div
       class="bg-white shadow-lg rounded-xl p-8 w-[800px] min-h-[50vh] flex flex-col justify-between"
     >
@@ -265,21 +273,14 @@ const starStyles = ref([
   </div>
   <!-- Kong End -->
   <!-- Wave Start -->
-  
-    <div
-      v-bind:hidden="currentScene !== 1"
-      class="w-[100%] h-[100vh] bg-green-300 flex justify-center items-center"
-    >
-      <h1 class="text-3xl">Scene 2</h1>
-    </div>
-
   <div
     v-if="isTransitioning"
     class="fadeUptoDown-transition fixed inset-0 z-50 bg-black pointer-events-none"
   ></div>
   <!-- Wave End -->
   <!-- Boom Start -->
-<div
+  <div
+    v-bind:hidden="currentScene !== 1"
     class="min-h-screen bg-gray-100 flex items-center justify-center font-sans text-gray-800"
     style="
       background-image: url(/src/assets/background.png);
@@ -287,7 +288,7 @@ const starStyles = ref([
       background-position: center center;
     "
   >
-    <svg id="svg"></svg>
+    <svg style="z-index: -1" id="svg"></svg>
     <div id="map" class="flex flex-col items-center z-10">
       <img
         v-for="(style, index) in starStyles"
