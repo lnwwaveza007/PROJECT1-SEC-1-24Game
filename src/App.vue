@@ -4,6 +4,7 @@ import { ref, onMounted,computed,watch } from "vue";
 
 const numbers = ref([]);
 const equation = ref("");
+
 const selectedNumbers = ref([]);
 
 //ตรวจสอบว่าตัวเลขถูกเลือกหรือยัง
@@ -87,8 +88,30 @@ const newGame = () => {
 onMounted(() => {
   newGame();
 });
+
 //Kong End
 //Wave Start
+const currentScene = ref(0);
+const isTransitioning = ref(false);
+
+const scenes = [
+  { id: 0, name: "Main Game" },
+  { id: 1, name: "Scene 2" },
+];
+
+const changeScene = (id) => {
+  if (currentScene.value === id) return;
+
+  isTransitioning.value = true;
+
+  setTimeout(() => {
+    currentScene.value = id;
+
+    setTimeout(() => {
+      isTransitioning.value = false;
+    }, 1000);
+  }, 1000);
+};
 //Wave End
 //Boom Start
 //Boom End
@@ -99,6 +122,17 @@ onMounted(() => {
 </script>
 
 <template>
+  <div class="px-2 flex gap-3">
+    <h1>Scene selector</h1>
+    <button
+      class="px-2 bg-red-200"
+      v-for="scene in scenes"
+      :key="scene.id"
+      @click="changeScene(scene.id)"
+    >
+      {{ scene.name }}
+    </button>
+  </div>
   <!-- Kong Start -->
   <div
     class="min-h-screen bg-gray-100 flex items-center justify-center font-sans text-gray-800"
@@ -209,6 +243,18 @@ onMounted(() => {
   </div>
   <!-- Kong End -->
   <!-- Wave Start -->
+  
+    <div
+      v-bind:hidden="currentScene !== 1"
+      class="w-[100%] h-[100vh] bg-green-300 flex justify-center items-center"
+    >
+      <h1 class="text-3xl">Scene 2</h1>
+    </div>
+
+  <div
+    v-if="isTransitioning"
+    class="fadeUptoDown-transition fixed inset-0 z-50 bg-black pointer-events-none"
+  ></div>
   <!-- Wave End -->
   <!-- Boom Start -->
 
@@ -223,6 +269,18 @@ onMounted(() => {
 /* Kong Start */
 /* Kong End */
 /* Wave Start */
+@keyframes fadeUptoDown {
+  0% {
+    clip-path: inset(0 0 100% 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.fadeUptoDown-transition {
+  animation: fadeUptoDown 1s ease-out forwards;
+}
 /* Wave End */
 /* Boom Start */
 /* Boom End */
