@@ -34,22 +34,47 @@ const message = ref("")
         message.value = "กรุณาเลือกตัวเลข 2 ตัว";
         return;
       }
+    const num1 = numbers.value[selectedNumbers.value[0]]
+    const num2 = numbers.value[selectedNumbers.value[1]]
+    let result
+
+    switch(operator){
+      case "+":
+        result = num1 + num1
+        break
+      case "-":
+        result = num1 - num2
+        break
+      case "*":
+        result = num1 * num2
+        break
+      case "/":
+        result = num1 / num2
+        break
     }
 
+    //เอาตัวเลขมาแทนที่เวลาถูกเลือกหรือบวกเชน่ 1 + 2 ตัวเลขที่จะแสดงออกมาจริงๆคือ 3 เลยในหน้าต่างแสดงผล
+    numbers.value.splice(Math.max(...selectedNumbers.value),1)
+    numbers.value.splice(Math.min(...selectedNumbers.value),1) // ใช้ spread ในการกระจายค่าของ  Array
+    numbers.value.push(result)
+
+    selectedNumbers.value = []
+    message.value = ""
+    }
+ 
 const clear = () => {
-  equation.value = "";
   selectedNumbers.value = [];
   message.value = "";
 };
 
+
 const selectNumber = (index) => {
-  if (selectedNumbers.value.includes(index)) {
-    message.value = "You already selected this number.";
-    return;
-  }
-  selectedNumbers.value.push(index);
-  equation.value += numbers.value[index];
-};
+      if (selectedNumbers.value.includes(index)) {
+        selectedNumbers.value = selectedNumbers.value.filter(i => i !== index);
+      } else {
+        selectedNumbers.value.push(index);
+      }
+    };
 
 const newGame = () => {
   generateNumbers();
