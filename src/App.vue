@@ -4,33 +4,37 @@ import { ref, onMounted, computed, watch } from "vue";
 
 const numbers = ref([]);
 const selectedNumbers = ref([]);
-
+const message = ref("")
 // watcher ตรวจสอบ selectedNumbers
-watch(
-  selectedNumbers,
-  (newValue, OldValue) => {
-    if (newValue.length > 4) {
-      alert("Error: You can select up to 4 number");
-      selectedNumbers.value = OldValue;
-      equation.value = "";
-    }
-  },
-  {
-    deep: true,
-  }
-);
-const generateNumbers = () => {
-  numbers.value = [];
-  for (let i = 0; i < 4; i++) {
-    numbers.value.push(Math.floor(Math.random() * 9) + 1);
-  }
-  selectedNumbers.value = [];
-  message.value = "";
-};
+ watch(
+      selectedNumbers,
+      (newValue, oldValue) => {
+        if (newValue.length > 2) {
+          alert("Error: You can select up to 2 number");
+          selectedNumbers.value = oldValue;
+        }
+      },
+      {
+        deep: true,
+      }
+    );
 
-const addOperator = (operator) => {
-  equation.value += operator;
-};
+    
+    const generateNumbers = () => {
+      numbers.value = [];
+      for (let i = 0; i < 4; i++) {
+        numbers.value.push(Math.floor(Math.random() * 9) + 1);
+      }
+      selectedNumbers.value = [];
+      message.value = "";
+    };
+
+    const addOperator = (operator) => {
+      if (selectedNumbers.value.length !== 2) {
+        message.value = "กรุณาเลือกตัวเลข 2 ตัว";
+        return;
+      }
+    }
 
 const clear = () => {
   equation.value = "";
