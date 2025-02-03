@@ -1,107 +1,111 @@
 <script setup>
 //Kong Start
 import { ref, onMounted, computed, watch } from "vue";
+
 const numbers = ref([]);
-const storeNumbers = ref([])
+const storeNumbers = ref([]);
 const selectedNumbers = ref([]);
 const message = ref("");
 const isNumberSelectable = ref(true);
-const operationHistory = ref([])
+const operationsHistory = ref([]);
 
 const generateNumbers = () => {
   numbers.value = [];
   for (let i = 0; i < 4; i++) {
     numbers.value.push(Math.floor(Math.random() * 9) + 1);
   }
-  storeNumbers.value = [...numbers.value]
-  selectedNumbers.value = []
-  message.value = ""
-  operationHistory.value = []
+  storeNumbers.value = [...numbers.value];
+  selectedNumbers.value = [];
+  message.value = "";
+  operationsHistory.value = [];
 };
 
 const addOperator = (operator) => {
-    if (selectedNumbers.value.length !== 2) {
-        message.value = "Please select 2 numbers";
-        return;
-    }
+  if (selectedNumbers.value.length !== 2) {
+    message.value = "Please select 2 numbers";
+    return;
+  }
 
-    const index1 = selectedNumbers.value[0]; 
-    const index2 = selectedNumbers.value[1]; 
+  const sortedIndexes = [...selectedNumbers.value].sort((a, b) =>
+    selectedNumbers.value.indexOf(a) - selectedNumbers.value.indexOf(b)
+  );
 
-    const num1 = numbers.value[index1];
-    const num2 = numbers.value[index2];
-    let result;
+  const index1 = sortedIndexes[0]; 
+  const index2 = sortedIndexes[1]; 
 
-    switch (operator) {
-        case "+":
-            result = num1 + num2;
-            break;
-        case "-":
-            result = num1 - num2;
-            break;
-        case "*":
-            result = num1 * num2;
-            break;
-        case "/":
-            result = num1 / num2;
-            break;
-    }
+  const num1 = numbers.value[index1];
+  const num2 = numbers.value[index2];
+  let result;
 
-    operationHistory.value.push({
-      numbers: [...numbers.value],
-      selectedNumbers: [...selectedNumbers.value]
-    })
+  switch (operator) {
+    case "+":
+      result = num1 + num2;
+      break;
+    case "-":
+      result = num1 - num2;
+      break;
+    case "*":
+      result = num1 * num2;
+      break;
+    case "/":
+      result = num1 / num2;
+      break;
+  }
 
-    numbers.value[index1] = result; 
+  operationsHistory.value.push({
+    numbers: [...numbers.value],
+    selectedNumbers: [...selectedNumbers.value],
+  });
 
-    if (index1 !== index2) { 
-        numbers.value.splice(Math.max(index1, index2), 1); 
-    }
+  numbers.value[index1] = result;
 
-    if (numbers.value.length === 1 && numbers.value[0] === 24) {
-        message.value = "Correct! The result is 24!";
-    } else {
-        message.value = "";
-    }
+  if (index1 !== index2) {
+    numbers.value.splice(index2, 1);
+  }
 
-    selectedNumbers.value = [];
+  if (numbers.value.length === 1 && numbers.value[0] === 24) {
+    message.value = "Correct! The result is 24!";
+  } else {
+    message.value = "";
+  }
+
+  selectedNumbers.value = [];
 };
 
 const clear = () => {
-  if(operationHistory.value.length > 0){
-    const previousState = operationHistory.value.pop()
-    numbers.value = previousState.numbers
-    selectedNumbers.value = previousState.selectedNumbers
-  }else{
-    numbers.value = [...storeNumbers.value]
-    selectedNumbers.value = []
+  if (operationsHistory.value.length > 0) {
+    const previousState = operationsHistory.value.pop();
+    numbers.value = previousState.numbers;
+    selectedNumbers.value = previousState.selectedNumbers;
+  } else {
+    numbers.value = [...storeNumbers.value];
+    selectedNumbers.value = [];
   }
-  message.value = ""
-  isNumberSelectable.value = true
+  message.value = "";
+  isNumberSelectable.value = true;
 };
 
- watch(
-      selectedNumbers,
-      (newValue, oldValue) => {
-        if (newValue.length >= 2) {  
-          isNumberSelectable.value = false;
-        } else {
-          isNumberSelectable.value = true;
-        }
-      },
-      {
-        deep: true,
-      }
-    );
-
+watch(
+  selectedNumbers,
+  (newValue, oldValue) => {
+    if (newValue.length >= 2) {
+      isNumberSelectable.value = false;
+    } else {
+      isNumberSelectable.value = true;
+    }
+  },
+  {
+    deep: true,
+  }
+);
 
 const selectNumber = (index) => {
   if (!isNumberSelectable.value && !selectedNumbers.value.includes(index)) {
     message.value = "You can only select 2 numbers";
     setTimeout(() => {
       message.value = "";
-    }, 3000); 
-    return; 
+    }, 3000);
+    return;
   }
 
   if (selectedNumbers.value.includes(index)) {
