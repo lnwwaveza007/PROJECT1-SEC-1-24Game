@@ -101,6 +101,7 @@ const isTransitioning = ref(false);
 const scenes = [
   { id: 0, name: "Main Game" },
   { id: 1, name: "Level Up" },
+  { id: 2, name: "Story" },
 ];
 
 const changeScene = (id) => {
@@ -155,6 +156,32 @@ const starStyles = ref([
 //Chica Start
 //Chica End
 //Tonpee Start
+const stories = ref([
+  {
+    image:
+      "./../public/storys/friend-talking-and-other-friend-responding-with-funny-v0-f2csx8gx8gzc1.webp",
+    text: "This is the beginning of your adventure.",
+  },
+  {
+    image:
+      "./../public/storys/friend-talking-and-other-friend-responding-with-funny-v0-zf4h79gx8gzc1.webp",
+    text: "You encountered a mysterious stranger.",
+  },
+  {
+    image: "./../public/storys/images.jpeg",
+    text: "A challenge awaits you ahead.",
+  },
+]);
+
+const currentStoryIndex = ref(0);
+
+const nextStory = () => {
+  if (currentStoryIndex.value < stories.value.length - 1) {
+    currentStoryIndex.value++;
+  } else {
+    changeScene(0);
+  }
+};
 //Tonpee End
 </script>
 
@@ -303,6 +330,19 @@ const starStyles = ref([
     </div>
   </div>
   <!-- Boom End -->
+  <!-- Tonpee Start-->
+
+  <div v-if="currentScene === 2" class="flex flex-col items-center">
+    <img :src="stories[currentStoryIndex].image" class="w-1/2" />
+    <p class="text-xl mt-4">{{ stories[currentStoryIndex].text }}</p>
+    <button
+      @click="nextStory"
+      class="px-4 py-2 bg-blue-500 text-white rounded-md mt-4"
+    >
+      Next
+    </button>
+  </div>
+  <!-- Tonpee End -->
 </template>
 
 <style scoped>
