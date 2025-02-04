@@ -368,6 +368,7 @@ const nextStory = () => {
 .fadeUptoDown-transition {
   animation: fadeUptoDown 1s ease-out forwards;
 }
+
 /* Wave End */
 /* Boom Start */
 /* Boom End */
@@ -375,4 +376,5 @@ const nextStory = () => {
 /* Chica End */
 /* Tonpee Start */
 /* Tonpee End */
+
 </style>
