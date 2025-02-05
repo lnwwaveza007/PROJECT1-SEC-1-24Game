@@ -1,6 +1,6 @@
 <script setup>
 //Kong Start
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 const numbers = ref([]);
 const storeNumbers = ref([]);
