@@ -3,86 +3,116 @@
 import { ref, onMounted, computed, watch } from "vue";
 
 const numbers = ref([]);
-const equation = ref("");
-
+const storeNumbers = ref([]);
 const selectedNumbers = ref([]);
+const message = ref("");
+const isNumberSelectable = ref(true);
+const operationsHistory = ref([]);
 
-//ตรวจสอบว่าตัวเลขถูกเลือกหรือยัง
-const isSelectedNumbers = computed(() => {
-  return (index) => selectedNumbers.value.includes(index);
-});
-
-//ตรวจสอบสมการว่าถูกต้องไหม
-const isEquationValid = computed(() => {
-  try {
-    eval(equation.value);
-    return selectedNumbers.value.length > 0; // เลือกตัวเลขอย่างน้อย 1 ตัว
-  } catch {
-    return false;
+const generateNumbers = () => {
+  numbers.value = [];
+  for (let i = 0; i < 4; i++) {
+    numbers.value.push(Math.floor(Math.random() * 9) + 1);
   }
-});
+  storeNumbers.value = [...numbers.value];
+  selectedNumbers.value = [];
+  message.value = "";
+  operationsHistory.value = [];
+};
 
-//สร้าง message
-const message = computed(() => {
-  if (selectedNumbers.value.length === 0 && equation.value.length === 0) {
-    return ""; //start
+const addOperator = (operator) => {
+  if (selectedNumbers.value.length !== 2) {
+    message.value = "Please select 2 numbers";
+    return;
   }
-  try {
-    const result = eval(equation.value);
-    if (result === 24) {
-      return "Correct! The result is 24!";
-    } else {
-      return `Incorrect your result is ${result} , please try again`;
-    }
-  } catch {
-    return "Invalid equation! Please check your input";
-  }
-});
 
-// watcher ตรวจสอบ selectedNumbers
+  const sortedIndexes = [...selectedNumbers.value].sort((a, b) =>
+    selectedNumbers.value.indexOf(a) - selectedNumbers.value.indexOf(b)
+  );
+
+  const index1 = sortedIndexes[0]; 
+  const index2 = sortedIndexes[1]; 
+
+  const num1 = numbers.value[index1];
+  const num2 = numbers.value[index2];
+  let result;
+
+  switch (operator) {
+    case "+":
+      result = num1 + num2;
+      break;
+    case "-":
+      result = num1 - num2;
+      break;
+    case "*":
+      result = num1 * num2;
+      break;
+    case "/":
+      result = num1 / num2;
+      break;
+  }
+
+  operationsHistory.value.push({
+    numbers: [...numbers.value],
+    selectedNumbers: [...selectedNumbers.value],
+  });
+
+  numbers.value[index1] = result;
+
+  if (index1 !== index2) {
+    numbers.value.splice(index2, 1);
+  }
+
+  if (numbers.value.length === 1 && numbers.value[0] === 24) {
+    message.value = "Correct! The result is 24!";
+  } else {
+    message.value = "";
+  }
+
+  selectedNumbers.value = [];
+};
+
+const clear = () => {
+  if (operationsHistory.value.length > 0) {
+    const previousState = operationsHistory.value.pop();
+    numbers.value = previousState.numbers;
+    selectedNumbers.value = previousState.selectedNumbers;
+  } else {
+    numbers.value = [...storeNumbers.value];
+    selectedNumbers.value = [];
+  }
+  message.value = "";
+  isNumberSelectable.value = true;
+};
+
 watch(
   selectedNumbers,
-  (newValue, OldValue) => {
-    if (newValue.length > 4) {
-      alert("Error: You can select up to 4 number");
-      selectedNumbers.value = OldValue;
-      equation.value = "";
+  (newValue, oldValue) => {
+    if (newValue.length >= 2) {
+      isNumberSelectable.value = false;
+    } else {
+      isNumberSelectable.value = true;
     }
   },
   {
     deep: true,
   }
 );
-const generateNumbers = () => {
-  numbers.value = [];
-  for (let i = 0; i < 4; i++) {
-    numbers.value.push(Math.floor(Math.random() * 9) + 1);
-  }
-  selectedNumbers.value = [];
-  message.value = "";
-};
-
-const addOperator = (operator) => {
-  equation.value += operator;
-};
-
-const addParenthesis = (parenthesis) => {
-  equation.value += parenthesis;
-};
-
-const clear = () => {
-  equation.value = "";
-  selectedNumbers.value = [];
-  message.value = "";
-};
 
 const selectNumber = (index) => {
-  if (selectedNumbers.value.includes(index)) {
-    message.value = "You already selected this number.";
+  if (!isNumberSelectable.value && !selectedNumbers.value.includes(index)) {
+    message.value = "You can only select 2 numbers";
+    setTimeout(() => {
+      message.value = "";
+    }, 3000);
     return;
   }
-  selectedNumbers.value.push(index);
-  equation.value += numbers.value[index];
+
+  if (selectedNumbers.value.includes(index)) {
+    selectedNumbers.value = selectedNumbers.value.filter((i) => i !== index);
+  } else {
+    selectedNumbers.value.push(index);
+  }
 };
 
 const newGame = () => {
@@ -92,7 +122,6 @@ const newGame = () => {
 onMounted(() => {
   newGame();
 });
-
 //Kong End
 //Wave Start
 const currentScene = ref(0);
@@ -101,6 +130,8 @@ const isTransitioning = ref(false);
 const scenes = [
   { id: 0, name: "Main Game" },
   { id: 1, name: "Level Up" },
+  { id: 2, name: "Story" },
+  { id: 3, name: "Main Menu"}
 ];
 
 const changeScene = (id) => {
@@ -164,122 +195,170 @@ const starStyles = ref([
 ]);
 
 //Boom End
-//Chica Start
-//Chica End
+//Chicha Start
+let MainMenuhover = ref('');
+
+const hoverBtn = (event, isHover) => {
+  if (isHover) {
+    MainMenuhover.value = event.target.id;
+  } else {
+    MainMenuhover.value = '';
+  }
+};
+//Chicha End
 //Tonpee Start
+const stories = ref([
+  {
+    image:
+      "/storys/friend-talking-and-other-friend-responding-with-funny-v0-f2csx8gx8gzc1.webp",
+    text: "This is the beginning of your adventure.",
+  },
+  {
+    image:
+      "/storys/friend-talking-and-other-friend-responding-with-funny-v0-zf4h79gx8gzc1.webp",
+    text: "You encountered a mysterious stranger.",
+  },
+  {
+    image: "/storys/images.jpeg",
+    text: "A challenge awaits you ahead.",
+  },
+]);
+
+const currentStoryIndex = ref(0);
+const storyButton = ref("NEXT");
+
+const nextStory = () => {
+  if (currentStoryIndex.value < stories.value.length - 2) {
+    currentStoryIndex.value++;
+  } else if (currentStoryIndex.value < stories.value.length - 1) {
+    storyButton.value = "EXIT";
+    currentStoryIndex.value++;
+  } else {
+    changeScene(0);
+    setTimeout(() => {
+      storyButton.value = "NEXT";
+      currentStoryIndex.value = 0;
+    },1000)
+  }
+};
 //Tonpee End
 </script>
 
 <template>
-  <div class="px-2 flex gap-3">
-    <h1>Scene selector</h1>
-    <button
-      class="px-2 bg-red-200"
-      v-for="scene in scenes"
-      :key="scene.id"
-      @click="changeScene(scene.id)"
-    >
-      {{ scene.name }}
-    </button>
-  </div>
+  <nav class="bg-gray-800 p-4">
+    <div class="container mx-auto flex items-center justify-between">
+      <h1 class="text-white text-lg font-bold">Scene Selector</h1>
+      <ul class="flex space-x-4">
+        <li v-for="scene in scenes" :key="scene.id">
+          <button
+            class="px-4 py-2 rounded-md text-white transition-colors duration-200"
+            :class="{
+              'bg-red-500 hover:bg-red-600': activeSceneId === scene.id,
+              'bg-gray-700 hover:bg-gray-600': activeSceneId !== scene.id,
+            }"
+            @click="changeScene(scene.id)"
+          >
+            {{ scene.name }}
+          </button>
+        </li>
+      </ul>
+    </div>
+  </nav>
   <!-- Kong Start -->
-  <div v-bind:hidden="currentScene !== 0">
+  <div
+    v-bind:hidden="currentScene !== 0"
+    class="flex flex-col justify-center items-center h-screen"
+    style="
+      background-image: url(/src/assets/Background-main-game.png);
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+    "
+  >
+  <img
+      src="/src/assets/Stamina.png"
+      alt=""
+      class="absolute top-20 left-4 w-52 h-16 object-contain z-10"
+    />
     <div
-      class="bg-white shadow-lg rounded-xl p-8 w-[800px] min-h-[50vh] flex flex-col justify-between"
+      class="container mx-auto p-4"
+      style="
+        background-image: url(/src//assets//Placeholder.png);
+        background-size: contain;
+        background-position: center center;
+        background-repeat: no-repeat;
+        width: 770px;
+        height: 410px;
+        position: relative;
+        bottom: 6em;
+        left: 1.5em;
+      "
     >
-      <h1 class="text-[3em] font-bold text-center">Game 24</h1>
+      <div class="relative top-16 right-10">
+        <h1 class="text-3xl font-bold text-center mb-4">24GAME</h1>
 
-      <!-- Display Random Numbers -->
-      <div class="flex justify-center gap-4 my-4">
-        <button
-          v-for="(num, index) in numbers"
-          :key="index"
-          class="px-6 py-3 text-[3em] font-semibold bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition"
-          :class="{ 'bg-green-500': selectedNumbers.includes(index) }"
-          @click="selectNumber(index)"
-        >
-          {{ num }}
-        </button>
-      </div>
+        <div class="flex justify-center mb-4">
+          <div
+            v-for="(number, index) in numbers"
+            :key="index"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-6 rounded-lg m-2 cursor-pointer select-none min-w-[60px] text-center transition-colors duration-200"
+            :class="{
+              'bg-yellow-500 hover:bg-yellow-600':
+                selectedNumbers.includes(index),
+              'opacity-50 cursor-not-allowed':
+                !isNumberSelectable && !selectedNumbers.includes(index),
+            }"
+            @click="selectNumber(index)"
+          >
+            {{ number }}
+          </div>
+        </div>
 
-      <!-- Display Equation -->
-      <div class="text-center text-[2em] font-mono mb-4">
-        <p>
-          Equation: <span class="text-gray-500">{{ equation }}</span>
-        </p>
-      </div>
+        <div class="flex justify-center mb-4">
+          <button
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded m-1"
+            @click="addOperator('+')"
+          >
+            +
+          </button>
+          <button
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded m-1"
+            @click="addOperator('-')"
+          >
+            -
+          </button>
+          <button
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded m-1"
+            @click="addOperator('*')"
+          >
+            *
+          </button>
+          <button
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded m-1"
+            @click="addOperator('/')"
+          >
+            /
+          </button>
+        </div>
 
-      <!-- Operator Buttons -->
-      <div class="grid grid-cols-6 gap-2 mb-4 text-[2em]">
-        <button
-          @click="addOperator('+')"
-          class="btn bg-amber-100 rounded-lg w-16"
-        >
-          +
-        </button>
-        <button
-          @click="addOperator('-')"
-          class="btn bg-amber-100 rounded-lg w-16"
-        >
-          -
-        </button>
-        <button
-          @click="addOperator('*')"
-          class="btn bg-amber-100 rounded-lg w-16"
-        >
-          ×
-        </button>
-        <button
-          @click="addOperator('/')"
-          class="btn bg-amber-100 rounded-lg w-16"
-        >
-          ÷
-        </button>
-        <button
-          @click="addParenthesis('(')"
-          class="btn bg-amber-100 rounded-lg w-16"
-        >
-          (
-        </button>
-        <button
-          @click="addParenthesis(')')"
-          class="btn bg-amber-100 rounded-lg w-16"
-        >
-          )
-        </button>
-      </div>
+        <div class="text-center mb-4">
+          <p v-if="message" class="text-lg">{{ message }}</p>
+        </div>
 
-      <!-- Action Buttons -->
-      <div class="flex justify-center gap-4">
-        <button
-          @click="clear"
-          class="px-4 py-2 bg-red-500 text-white text-[2em] rounded-md hover:bg-red-600"
-        >
-          Clear
-        </button>
-        <button
-          @click="checkResult"
-          class="px-4 py-2 bg-green-500 text-white text-[2em] rounded-md hover:bg-green-600"
-        >
-          Check
-        </button>
-        <button
-          @click="newGame"
-          class="px-4 py-2 bg-blue-500 text-white text-[2em] rounded-md hover:bg-blue-600"
-        >
-          New Game
-        </button>
-      </div>
-
-      <!-- Feedback Message -->
-      <div class="text-center mt-4 text-lg font-semibold">
-        <p
-          :class="
-            message.includes('Correct') ? 'text-green-600' : 'text-red-600'
-          "
-        >
-          {{ message }}
-        </p>
+        <div class="flex justify-center">
+          <button
+            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded m-1"
+            @click="newGame"
+          >
+            New game
+          </button>
+          <button
+            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded m-1"
+            @click="clear"
+          >
+            Clear
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -324,9 +403,55 @@ const starStyles = ref([
     </div>
   </div>
   <!-- Boom End -->
+  <!-- Tonpee Start-->
+  <div v-if="currentScene === 2" class="flex flex-col items-center">
+    <img :src="stories[currentStoryIndex].image" class="w-1/2" />
+    <p class="text-xl mt-4">{{ stories[currentStoryIndex].text }}</p>
+    <button
+      v-text="storyButton"
+      @click="nextStory"
+      class="px-4 py-2 bg-blue-500 text-white rounded-md mt-4"
+    ></button>
+  </div>
+  <!-- Tonpee End -->
+  <!-- Chicha Start -->
+  <div v-if="currentScene == 3" style="
+    background-image: url('/main-menu/menu_bg.png');
+    background-size: cover;
+    background-position: center center;"
+  class="h-screen w-screen flex flex-col items-center pt-50 gap-7">
+      <h1 class="text-6xl text-[#ffd100] pixelFont"style="-webkit-text-stroke: 0.07em #2e1b5b;">24 GAME</h1>
+      <div class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+        @mouseover="hoverBtn($event, true)" @mouseleave="hoverBtn($event, false)">
+          <span v-show="MainMenuhover === 'playBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">▶</span>
+          <h2 id="playBtn" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">Play</h2>
+          <span v-show="MainMenuhover === 'playBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">◀</span>
+      </div>
+      <div class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+        @mouseover="hoverBtn($event, true)" @mouseleave="hoverBtn($event, false)">
+          <span v-show="MainMenuhover === 'storyBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">▶</span>
+          <h2 id="storyBtn" class="text-4xl text-[#ffd100] "style="-webkit-text-stroke: 0.07em #2e1b5b;">Story</h2>
+          <span v-show="MainMenuhover === 'storyBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">◀</span>
+      </div>
+  </div>
+  <!-- Chicha End -->
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+#svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.pixelFont{
+  font-family: 'Press Start 2P', sans-serif;
+}
+div{
+  font-family: 'Press Start 2P', sans-serif;
+}
 /* Kong Start */
 /* Kong End */
 /* Wave Start */
@@ -342,6 +467,7 @@ const starStyles = ref([
 .fadeUptoDown-transition {
   animation: fadeUptoDown 1s ease-out forwards;
 }
+
 /* Wave End */
 /* Boom Start */
 #svg {
