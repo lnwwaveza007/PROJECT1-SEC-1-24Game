@@ -184,6 +184,15 @@ const starStyles = ref([
 ]);
 //Boom End
 //Chicha Start
+let MainMenuhover = ref('');
+
+const hoverBtn = (event, isHover) => {
+  if (isHover) {
+    MainMenuhover.value = event.target.id;
+  } else {
+    MainMenuhover.value = '';
+  }
+};
 //Chicha End
 //Tonpee Start
 const stories = ref([
@@ -389,13 +398,20 @@ const nextStory = () => {
     background-image: url('/main-menu/menu_bg.png');
     background-size: cover;
     background-position: center center;"
-  class="h-screen w-screen flex flex-col items-center pt-50 gap-5">
-      <h1 class="text-6xl text-[#ffd100] "
-      style="-webkit-text-stroke: 0.07em #2e1b5b;">24 GAME</h1>
-      <h2 class="mt-6 text-5xl text-[#ffd100] "
-      style="-webkit-text-stroke: 0.07em #2e1b5b;">Play</h2>
-      <h2 class="text-5xl text-[#ffd100] "
-      style="-webkit-text-stroke: 0.07em #2e1b5b;">Story</h2>
+  class="h-screen w-screen flex flex-col items-center pt-50 gap-7">
+      <h1 class="text-6xl text-[#ffd100] pixelFont"style="-webkit-text-stroke: 0.07em #2e1b5b;">24 GAME</h1>
+      <div class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+        @mouseover="hoverBtn($event, true)" @mouseleave="hoverBtn($event, false)">
+          <span v-show="MainMenuhover === 'playBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">▶</span>
+          <h2 id="playBtn" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">Play</h2>
+          <span v-show="MainMenuhover === 'playBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">◀</span>
+      </div>
+      <div class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+        @mouseover="hoverBtn($event, true)" @mouseleave="hoverBtn($event, false)">
+          <span v-show="MainMenuhover === 'storyBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">▶</span>
+          <h2 id="storyBtn" class="text-4xl text-[#ffd100] "style="-webkit-text-stroke: 0.07em #2e1b5b;">Story</h2>
+          <span v-show="MainMenuhover === 'storyBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">◀</span>
+      </div>
   </div>
   <!-- Chicha End -->
 </template>
