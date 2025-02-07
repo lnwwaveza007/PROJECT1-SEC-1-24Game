@@ -131,6 +131,7 @@ const scenes = [
   { id: 0, name: "Main Game" },
   { id: 1, name: "Level Up" },
   { id: 2, name: "Story" },
+  { id: 3, name: "Main Menu"}
 ];
 
 const changeScene = (id) => {
@@ -182,8 +183,8 @@ const starStyles = ref([
   { width: "20%", left: "140px" },
 ]);
 //Boom End
-//Chica Start
-//Chica End
+//Chicha Start
+//Chicha End
 //Tonpee Start
 const stories = ref([
   {
@@ -383,6 +384,20 @@ const nextStory = () => {
     ></button>
   </div>
   <!-- Tonpee End -->
+  <!-- Chicha Start -->
+  <div v-if="currentScene == 3" style="
+    background-image: url('/main-menu/menu_bg.png');
+    background-size: cover;
+    background-position: center center;"
+  class="h-screen w-screen flex flex-col items-center pt-50 gap-5">
+      <h1 class="text-6xl text-[#ffd100] "
+      style="-webkit-text-stroke: 0.07em #2e1b5b;">24 GAME</h1>
+      <h2 class="mt-6 text-5xl text-[#ffd100] "
+      style="-webkit-text-stroke: 0.07em #2e1b5b;">Play</h2>
+      <h2 class="text-5xl text-[#ffd100] "
+      style="-webkit-text-stroke: 0.07em #2e1b5b;">Story</h2>
+  </div>
+  <!-- Chicha End -->
 </template>
 
 <style scoped>
@@ -393,6 +408,9 @@ const nextStory = () => {
   left: 0;
   width: 100%;
   height: 100%;
+}
+.pixelFont{
+  font-family: 'Press Start 2P', sans-serif;
 }
 div{
   font-family: 'Press Start 2P', sans-serif;
