@@ -162,6 +162,7 @@ const starStyles = ref([
   { width: "20%", left: "-150px" },
   { width: "20%", left: "140px" },
 ]);
+
 //Boom End
 //Chica Start
 //Chica End
@@ -294,14 +295,15 @@ const starStyles = ref([
     v-bind:hidden="currentScene !== 1"
     class="min-h-screen bg-gray-100 flex items-center justify-center font-sans text-gray-800"
     style="
-      background-image: url(/src/assets/background.png);
+      background-image: url(/src/assets/Background2.png);
       background-size: cover;
       background-position: center center;
     "
   >
     <svg style="z-index: -1" id="svg"></svg>
 
-    <div id="map" class="flex flex-col items-center z-50"> //ปรับ z-index ให้เป็น 50 มากกว่า svg
+    <div id="map" class="flex flex-col items-center z-50">
+      <!-- ปรับ z-index ให้เป็น 50 มากกว่า svg -->
       <img
         v-for="(style, index) in starStyles"
         :key="index"
@@ -309,11 +311,15 @@ const starStyles = ref([
         :src="index === 0 ? '/icons/dimond.png' : '/icons/star.png'"
         :id="`Star${index}`"
         @click="move"
+        class="transition-transform duration-300 hover:scale-180"
       />
     </div>
 
     <div id="rocket" class="absolute w-[3%] ml-[100px] z-20">
-      <!-- <p>Player</p> -->
+      <button class="bg-green-600 text-white px-2 rounded-md font-semibold">
+        Play
+      </button>
+
       <img src="/icons/rocket.png" />
     </div>
   </div>
