@@ -26,12 +26,13 @@ const addOperator = (operator) => {
     return;
   }
 
-  const sortedIndexes = [...selectedNumbers.value].sort((a, b) =>
-    selectedNumbers.value.indexOf(a) - selectedNumbers.value.indexOf(b)
+  const sortedIndexes = [...selectedNumbers.value].sort(
+    (a, b) =>
+      selectedNumbers.value.indexOf(a) - selectedNumbers.value.indexOf(b)
   );
 
-  const index1 = sortedIndexes[0]; 
-  const index2 = sortedIndexes[1]; 
+  const index1 = sortedIndexes[0];
+  const index2 = sortedIndexes[1];
 
   const num1 = numbers.value[index1];
   const num2 = numbers.value[index2];
@@ -131,7 +132,7 @@ const scenes = [
   { id: 0, name: "Main Game" },
   { id: 1, name: "Level Up" },
   { id: 2, name: "Story" },
-  { id: 3, name: "Main Menu"}
+  { id: 3, name: "Main Menu" },
 ];
 
 const changeScene = (id) => {
@@ -196,13 +197,13 @@ const starStyles = ref([
 
 //Boom End
 //Chicha Start
-let MainMenuhover = ref('');
+let MainMenuhover = ref("");
 
 const hoverBtn = (event, isHover) => {
   if (isHover) {
     MainMenuhover.value = event.target.id;
   } else {
-    MainMenuhover.value = '';
+    MainMenuhover.value = "";
   }
 };
 //Chicha End
@@ -238,20 +239,20 @@ const nextStory = () => {
     setTimeout(() => {
       storyButton.value = "NEXT";
       currentStoryIndex.value = 0;
-    },1000)
+    }, 1000);
   }
 };
 //Tonpee End
 </script>
 
 <template>
-  <nav class="bg-gray-800 p-4">
-    <div class="container mx-auto flex items-center justify-between">
-      <h1 class="text-white text-lg font-bold">Scene Selector</h1>
-      <ul class="flex space-x-4">
-        <li v-for="scene in scenes" :key="scene.id">
+  <div class="bg-gray-800 p-4">
+    <div class="flex items-center text-[12px]">
+      <h1 class="text-white font-bold">Scene Selector</h1>
+      <div class="flex">
+        <div v-for="scene in scenes" :key="scene.id">
           <button
-            class="px-4 py-2 rounded-md text-white transition-colors duration-200"
+            class="px-4 py-2 rounded-md text-white transition-colors duration-200 text-[10px]"
             :class="{
               'bg-red-500 hover:bg-red-600': activeSceneId === scene.id,
               'bg-gray-700 hover:bg-gray-600': activeSceneId !== scene.id,
@@ -260,10 +261,10 @@ const nextStory = () => {
           >
             {{ scene.name }}
           </button>
-        </li>
-      </ul>
+        </div>
+      </div>
     </div>
-  </nav>
+  </div>
   <!-- Kong Start -->
   <div
     v-bind:hidden="currentScene !== 0"
@@ -275,35 +276,19 @@ const nextStory = () => {
       background-repeat: no-repeat;
     "
   >
-  <img
-      src="/src/assets/Stamina.png"
-      alt=""
-      class="absolute top-20 left-4 w-52 h-16 object-contain z-10"
-    />
     <div
-      class="container mx-auto p-4"
-      style="
-        background-image: url(/src//assets//Placeholder.png);
-        background-size: contain;
-        background-position: center center;
-        background-repeat: no-repeat;
-        width: 770px;
-        height: 410px;
-        position: relative;
-        bottom: 6em;
-        left: 1.5em;
-      "
+      class="mx-auto w-[90%] h-[50vh] md:w-[60%] lg:w-[700px] dialog"
     >
-      <div class="relative top-16 right-10">
+      <div class="flex flex-col justify-center items-center h-full">
         <h1 class="text-3xl font-bold text-center mb-4">24GAME</h1>
 
         <div class="flex justify-center mb-4">
           <div
             v-for="(number, index) in numbers"
             :key="index"
-            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-6 rounded-lg m-2 cursor-pointer select-none min-w-[60px] text-center transition-colors duration-200"
+            class="game-btn text-white font-bold py-4 px-6 rounded-lg m-2 cursor-pointer select-none min-w-[60px] text-center transition-colors duration-200"
             :class="{
-              'bg-yellow-500 hover:bg-yellow-600':
+              '-translate-y-2':
                 selectedNumbers.includes(index),
               'opacity-50 cursor-not-allowed':
                 !isNumberSelectable && !selectedNumbers.includes(index),
@@ -415,30 +400,96 @@ const nextStory = () => {
   </div>
   <!-- Tonpee End -->
   <!-- Chicha Start -->
-  <div v-if="currentScene == 3" style="
-    background-image: url('/main-menu/menu_bg.png');
-    background-size: cover;
-    background-position: center center;"
-  class="h-screen w-screen flex flex-col items-center pt-50 gap-7">
-      <h1 class="text-6xl text-[#ffd100] pixelFont"style="-webkit-text-stroke: 0.07em #2e1b5b;">24 GAME</h1>
-      <div class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
-        @mouseover="hoverBtn($event, true)" @mouseleave="hoverBtn($event, false)">
-          <span v-show="MainMenuhover === 'playBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">▶</span>
-          <h2 id="playBtn" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">Play</h2>
-          <span v-show="MainMenuhover === 'playBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">◀</span>
-      </div>
-      <div class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
-        @mouseover="hoverBtn($event, true)" @mouseleave="hoverBtn($event, false)">
-          <span v-show="MainMenuhover === 'storyBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">▶</span>
-          <h2 id="storyBtn" class="text-4xl text-[#ffd100] "style="-webkit-text-stroke: 0.07em #2e1b5b;">Story</h2>
-          <span v-show="MainMenuhover === 'storyBtn'" class="text-[#ffd100] " style="-webkit-text-stroke: 0.07em #2e1b5b;">◀</span>
-      </div>
+  <div
+    v-if="currentScene == 3"
+    style="
+      background-image: url('/main-menu/menu_bg.png');
+      background-size: cover;
+      background-position: center center;
+    "
+    class="h-screen w-screen flex flex-col items-center pt-50 gap-7"
+  >
+    <h1
+      class="text-6xl text-[#ffd100] pixelFont"
+      style="-webkit-text-stroke: 0.07em #2e1b5b"
+    >
+      24 GAME
+    </h1>
+    <div
+      class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+      @mouseover="hoverBtn($event, true)"
+      @mouseleave="hoverBtn($event, false)"
+    >
+      <span
+        v-show="MainMenuhover === 'playBtn'"
+        class="text-[#ffd100]"
+        style="-webkit-text-stroke: 0.07em #2e1b5b"
+        >▶</span
+      >
+      <h2
+        id="playBtn"
+        class="text-[#ffd100]"
+        style="-webkit-text-stroke: 0.07em #2e1b5b"
+      >
+        Play
+      </h2>
+      <span
+        v-show="MainMenuhover === 'playBtn'"
+        class="text-[#ffd100]"
+        style="-webkit-text-stroke: 0.07em #2e1b5b"
+        >◀</span
+      >
+    </div>
+    <div
+      class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+      @mouseover="hoverBtn($event, true)"
+      @mouseleave="hoverBtn($event, false)"
+    >
+      <span
+        v-show="MainMenuhover === 'storyBtn'"
+        class="text-[#ffd100]"
+        style="-webkit-text-stroke: 0.07em #2e1b5b"
+        >▶</span
+      >
+      <h2
+        id="storyBtn"
+        class="text-4xl text-[#ffd100]"
+        style="-webkit-text-stroke: 0.07em #2e1b5b"
+      >
+        Story
+      </h2>
+      <span
+        v-show="MainMenuhover === 'storyBtn'"
+        class="text-[#ffd100]"
+        style="-webkit-text-stroke: 0.07em #2e1b5b"
+        >◀</span
+      >
+    </div>
   </div>
   <!-- Chicha End -->
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+.game-btn {
+  border-image: url("/main-game/game-btn.png");
+  border-image-slice: 60 fill;
+  border-image-width: 40px;
+  border-image-repeat: repeat;
+  background-size: 105% 105%;
+  transition: translate 0.2s ease-out;
+}
+.dialog {
+  border-image: url("/main-game/dialog-bg.png");
+  border-image-slice: 160 fill;
+  border-image-width: 40px;
+  border-image-repeat: repeat;
+}
+.dialog::backdrop {
+  background: rgba(52, 70, 69, 0.567);
+}
+
 #svg {
   position: absolute;
   top: 0;
@@ -446,11 +497,11 @@ const nextStory = () => {
   width: 100%;
   height: 100%;
 }
-.pixelFont{
-  font-family: 'Press Start 2P', sans-serif;
+.pixelFont {
+  font-family: "Press Start 2P", sans-serif;
 }
-div{
-  font-family: 'Press Start 2P', sans-serif;
+div {
+  font-family: "Press Start 2P", sans-serif;
 }
 /* Kong Start */
 /* Kong End */
