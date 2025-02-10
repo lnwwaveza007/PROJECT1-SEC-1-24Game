@@ -74,16 +74,22 @@ const addOperator = (operator) => {
 };
 
 const clear = () => {
-  if (operationsHistory.value.length > 0) {
-    const previousState = operationsHistory.value.pop();
-    numbers.value = previousState.numbers;
-    selectedNumbers.value = previousState.selectedNumbers;
-  } else {
-    numbers.value = [...storeNumbers.value];
-    selectedNumbers.value = [];
+  if (health.value.current > 0) {
+    if (operationsHistory.value.length > 0) {
+      const previousState = operationsHistory.value.pop();
+      numbers.value = previousState.numbers;
+      selectedNumbers.value = previousState.selectedNumbers;
+    } else {
+      numbers.value = [...storeNumbers.value];
+      selectedNumbers.value = [];
+    }
+    message.value = "";
+    isNumberSelectable.value = true;
+    //Health decrease
+    health.value.current--;
+  }else {
+    message.value = "You can't revert anymore";
   }
-  message.value = "";
-  isNumberSelectable.value = true;
 };
 
 watch(
@@ -206,6 +212,11 @@ const hoverBtn = (event, isHover) => {
     MainMenuhover.value = "";
   }
 };
+
+let health = ref({
+  max: 3,
+  current: 3,
+});
 //Chicha End
 //Tonpee Start
 const stories = ref([
@@ -276,9 +287,15 @@ const nextStory = () => {
       background-repeat: no-repeat;
     "
   >
-    <div
-      class="mx-auto w-[90%] h-[50vh] md:w-[60%] lg:w-[700px] dialog"
-    >
+    <!-- Heart UI -->
+    <div class="heartbg flex justify-center items-center mb-15 gap-5 px-13 py-6">
+      <img
+        v-for="number in health.max"
+        :src="number <= health.current ? '/src/assets/main-game/heart_full.png' : '/src/assets/main-game/heart_empty.png'"
+        class="w-12 h-12"
+      />
+    </div>
+    <div class="mx-auto w-[90%] h-[50vh] md:w-[60%] lg:w-[700px] dialog">
       <div class="flex flex-col justify-center items-center h-full">
         <h1 class="text-3xl font-bold text-center mb-4">24GAME</h1>
 
@@ -288,8 +305,7 @@ const nextStory = () => {
             :key="index"
             class="game-btn text-white font-bold py-4 px-6 rounded-lg m-2 cursor-pointer select-none min-w-[60px] text-center transition-colors duration-200"
             :class="{
-              '-translate-y-2':
-                selectedNumbers.includes(index),
+              '-translate-y-2': selectedNumbers.includes(index),
               'opacity-50 cursor-not-allowed':
                 !isNumberSelectable && !selectedNumbers.includes(index),
             }"
@@ -341,7 +357,7 @@ const nextStory = () => {
             class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded m-1"
             @click="clear"
           >
-            Clear
+            Revert
           </button>
         </div>
       </div>
@@ -534,6 +550,13 @@ div {
 }
 /* Boom End */
 /* Chica Start */
+.heartbg {
+  border-image: url("./assets/main-game/heart_bg.png");
+  border-image-slice: 15 fill;
+  border-image-width: 50px;
+  border-image-outset: 0px 0px 0px 0px;
+  border-image-repeat: repeat repeat;
+}
 /* Chica End */
 /* Tonpee Start */
 /* Tonpee End */
