@@ -281,7 +281,7 @@ const nextStory = () => {
     v-bind:hidden="currentScene !== 0"
     class="flex flex-col justify-center items-center h-screen"
     style="
-      background-image: url(/src/assets/Background-main-game.png);
+      background-image: url('/src/assets/main-game/24game/main-game-bg.jpg');
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
@@ -291,7 +291,7 @@ const nextStory = () => {
     <div class="heartbg flex justify-center items-center mb-15 gap-5 px-13 py-6">
       <img
         v-for="number in health.max"
-        :src="number <= health.current ? '/src/assets/main-game/heart_full.png' : '/src/assets/main-game/heart_empty.png'"
+        :src="number <= health.current ? '/src/assets/main-game/heart/heart_full.png' : '/src/assets/main-game/heart/heart_empty.png'"
         class="w-12 h-12"
       />
     </div>
@@ -303,9 +303,10 @@ const nextStory = () => {
           <div
             v-for="(number, index) in numbers"
             :key="index"
-            class="game-btn text-white font-bold py-4 px-6 rounded-lg m-2 cursor-pointer select-none min-w-[60px] text-center transition-colors duration-200"
+            class="game-btn text-black font-bold py-4 px-6 rounded-lg m-2 cursor-pointer select-none min-w-[60px] text-center transition-colors duration-200"
             :class="{
               '-translate-y-2': selectedNumbers.includes(index),
+              'game-btn-gold': selectedNumbers.includes(index),
               'opacity-50 cursor-not-allowed':
                 !isNumberSelectable && !selectedNumbers.includes(index),
             }"
@@ -317,26 +318,30 @@ const nextStory = () => {
 
         <div class="flex justify-center mb-4">
           <button
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded m-1"
+            class="game-btn-gray cursor-not-allowed text-white font-bold py-3 px-4 rounded m-1"
             @click="addOperator('+')"
+            :class="selectedNumbers.length === 2 ? 'game-btn-green' : ''"
           >
             +
           </button>
           <button
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded m-1"
+            class="game-btn-gray cursor-not-allowed text-white font-bold py-2 px-4 rounded m-1"
             @click="addOperator('-')"
+            :class="selectedNumbers.length === 2 ? 'game-btn-green' : ''"
           >
             -
           </button>
           <button
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded m-1"
+            class="game-btn-gray cursor-not-allowed text-white font-bold py-2 px-4 rounded m-1"
             @click="addOperator('*')"
+            :class="selectedNumbers.length === 2 ? 'game-btn-green' : ''"
           >
             *
           </button>
           <button
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded m-1"
+            class="game-btn-gray cursor-not-allowed text-white font-bold py-2 px-4 rounded m-1"
             @click="addOperator('/')"
+            :class="selectedNumbers.length === 2 ? 'game-btn-green' : ''"
           >
             /
           </button>
@@ -489,19 +494,49 @@ const nextStory = () => {
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
 .game-btn {
-  border-image: url("/main-game/game-btn.png");
-  border-image-slice: 60 fill;
-  border-image-width: 40px;
+  border-image: url("./assets/main-game/24game/game-btn.png");
+  border-image-slice: 15 fill;
+  border-image-width: 20px;
   border-image-repeat: repeat;
   background-size: 105% 105%;
   transition: translate 0.2s ease-out;
 }
+
+.game-btn-gold{
+  border-image: url("./assets/main-game/24game/game-btn-gold.png");
+  border-image-slice: 15 fill;
+  border-image-width: 20px;
+  border-image-repeat: repeat;
+  background-size: 105% 105%;
+  transition: translate 0.2s ease-out;
+}
+
+.game-btn-gray{
+  border-image: url("./assets/main-game/24game/game-btn-gray.png");
+  border-image-slice: 15 fill;
+  border-image-width: 20px;
+  border-image-repeat: repeat;
+  background-size: 105% 105%;
+  transition: translate 0.2s ease-out;
+}
+
+.game-btn-green{
+  border-image: url("./assets/main-game/24game/game-btn-green.png");
+  border-image-slice: 15 fill;
+  border-image-width: 20px;
+  border-image-repeat: repeat;
+  background-size: 105% 105%;
+  transition: translate 0.2s ease-out;
+  cursor: pointer;
+}
+
 .dialog {
-  border-image: url("/main-game/dialog-bg.png");
-  border-image-slice: 160 fill;
-  border-image-width: 40px;
+  border-image: url("./assets/main-game/24game/dialog-bg.png");
+  border-image-slice: 13 fill;
+  border-image-width: 30px;
   border-image-repeat: repeat;
 }
+
 .dialog::backdrop {
   background: rgba(52, 70, 69, 0.567);
 }
@@ -551,11 +586,10 @@ div {
 /* Boom End */
 /* Chica Start */
 .heartbg {
-  border-image: url("./assets/main-game/heart_bg.png");
-  border-image-slice: 15 fill;
-  border-image-width: 50px;
+  border-image: url("./assets/main-game/heart/heart_bg.png");
+  border-image-slice: 8 fill;
+  border-image-width: 15px;
   border-image-outset: 0px 0px 0px 0px;
-  border-image-repeat: repeat repeat;
 }
 /* Chica End */
 /* Tonpee Start */
