@@ -158,6 +158,8 @@ const changeScene = (id) => {
 //Boom Start
 import { lineCreate } from "./utils/lineCreate";
 
+const showPlay = ref(true);
+
 watch(currentScene, (newValue) => {
   if (newValue !== 1) return;
   document.getElementById("svg").style.zIndex = 15; //ปรับ z-index ให้เป็น 15 ให้เส้นแสดง
@@ -180,12 +182,15 @@ watch(currentScene, (newValue) => {
 
 //move rocket
 function move(event) {
-  console.log("move");
+  showPlay.value = false;
   var x = event.x - 100;
   var y = event.y - 20;
   var rocket = document.getElementById("rocket");
   rocket.style.left = x + "px";
   rocket.style.top = y + "px";
+  setTimeout(() => {
+    showPlay.value = true;
+  },550)
 }
 
 // window.addEventListener("click", move);
@@ -257,7 +262,7 @@ const nextStory = () => {
 </script>
 
 <template>
-  <div class="bg-gray-800 p-4">
+  <div class="bg-gray-800 p-4" style="z-index: 100;">
     <div class="flex items-center text-[12px]">
       <h1 class="text-white font-bold">Scene Selector</h1>
       <div class="flex">
@@ -396,7 +401,7 @@ const nextStory = () => {
     </div>
 
     <div id="rocket" class="absolute w-[3%] ml-[100px] z-20">
-      <button class="bg-green-600 text-white px-2 rounded-md font-semibold">
+      <button v-show="showPlay" class="bg-green-600 text-white px-2 rounded-md font-semibold">
         Play
       </button>
 
