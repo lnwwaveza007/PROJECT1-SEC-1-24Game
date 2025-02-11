@@ -35,7 +35,7 @@
 ## Update
 | รหัส | สัปดาห์ที่ 1 | สัปดาห์ที่ 2 | สัปดาห์ที่ 3 | สัปดาห์ที่ 4 |
 |------|---------|---------|---------|---------|
-| 004  | waiting | waiting | waiting | waiting |
+| 004  | - ออกแบบระบบการเล่นเกมและ Design หน้า Main game | - ทดสอบ function ของเกมจริงๆว่าตรงกับ Require ของทีมหรือไม่ | - แก้ไข function บางอย่างให้ตรงกับ Require ของทีม | waiting |
 | 012  | - ออกแบบระบบการเปลี่ยนหน้าและทดสอบ | - ทดสอบระบบการเปลี่ยนหน้ากับหน้าจริงๆ </br>-ทำระบบโยงเส้นในหน้าเลือกด่าน | - ทำ Responsive ให้กับหน้า Main Game</br>- ปรับเปลี่ยน Design หน้า Main game ให้เหมาะกับการทำ Reponsive  | waiting |
 | 015  | waiting | waiting | waiting | waiting |
 | 024  | waiting | waiting | waiting | waiting |
