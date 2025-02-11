@@ -139,6 +139,7 @@ const scenes = [
   { id: 1, name: "Level Up" },
   { id: 2, name: "Story" },
   { id: 3, name: "Main Menu" },
+  { id: 4, name: "Result" },
 ];
 
 const changeScene = (id) => {
@@ -416,6 +417,7 @@ const nextStory = () => {
   </div>
   <!-- Tonpee End -->
   <!-- Chicha Start -->
+  <!-- Main Menu -->
   <div
     v-if="currentScene == 3"
     style="
@@ -480,6 +482,32 @@ const nextStory = () => {
         style="-webkit-text-stroke: 0.07em #2e1b5b"
         >◀</span
       >
+    </div>
+  </div>
+  <!-- Result -->
+  <div
+    v-if="currentScene == 4"
+    style="
+      background-image: url('/src/assets/result/result_bg.png');
+      background-size: cover;
+      background-position: center center;
+    "
+    class="h-screen w-screen flex justify-center items-center"
+  >
+    <div class="result-box w-[90%] md:w-[70%] lg:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[7%] gap-10">
+      <div class="flex flex-row justify-center gap-5">
+        <img
+          v-for="i in 3"
+          src="/src/assets/result/star.png"
+          class="w-30 h-30"
+          alt="star"
+        />
+      </div>
+      <div class="flex flex-col items-center gap-4">
+        <h1 class="text-[#ffe14d] text-5xl" style="-webkit-text-stroke: 0.09em #b33818" >LEVEL</h1>
+        <h1 class="text-[#ffe14d] text-5xl" style="-webkit-text-stroke: 0.09em #b33818" >COMPLETED</h1>
+      </div>
+      
     </div>
   </div>
   <!-- Chicha End -->
@@ -556,6 +584,14 @@ div {
   border-image-width: 50px;
   border-image-outset: 0px 0px 0px 0px;
   border-image-repeat: repeat repeat;
+}
+.result-box {
+  border-image: url("./assets/result/result_box.png");
+  border-image-slice: 60;
+  border-image-width: 40px;
+  border-image-repeat: repeat;
+  background-size: 105% 105%;
+  background-color: #8dcced;
 }
 /* Chica End */
 /* Tonpee Start */
