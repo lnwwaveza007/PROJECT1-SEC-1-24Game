@@ -204,6 +204,8 @@ const starStyles = ref([
 
 //Boom End
 //Chicha Start
+import { calResult } from "./utils/resultCal";
+
 let MainMenuhover = ref("");
 
 const hoverBtn = (event, isHover) => {
@@ -216,13 +218,10 @@ const hoverBtn = (event, isHover) => {
 
 const health = ref({
   max: 3,
-  current: 3,
+  current: 1,
 });
 
-const result = {
-  star: 2,
-  level: 1
-}
+const result = calResult(health.value, { max_time: 60, left_time: 50 }, 1)
 //Chicha End
 //Tonpee Start
 const stories = ref([
@@ -516,7 +515,11 @@ const nextStory = () => {
       <div class="flex flex-row justify-center gap-7">
         <img
           v-for="(star, index) in 3"
-          :src="index < result.star ? '/src/assets/result/star.png' : '/src/assets/result/star_empty.png'"
+          :src="
+            index < result.star
+              ? '/src/assets/result/star.png'
+              : '/src/assets/result/star_empty.png'
+          "
           class="w-30 h-30"
           :class="index < result.star ? 'pulse-animation' : ''"
           alt="star"
@@ -536,20 +539,23 @@ const nextStory = () => {
           COMPLETED
         </h1>
       </div>
-      <button @click="changeScene(1)" class="game-btn-gold p-3 cursor-pointer hover:-translate-y-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            x="0px"
-            y="0px"
-            width="100"
-            height="100"
-            viewBox="0 0 32 32"
-            fill="#fff"
-          >
-            <path
-              d="M 13 4 L 13 6 L 9 6 L 9 8 L 5 8 L 5 10 L 2 10 L 2 11 L 2 12 L 2 13 L 4 13 L 4 28 L 28 28 L 28 13 L 30 13 L 30 12 L 30 11 L 30 10 L 27 10 L 27 9 L 27 8 L 27 4 L 25 4 L 25 8 L 23 8 L 23 6 L 19 6 L 19 4 L 13 4 z M 14 7 L 18 7 L 18 8 L 18 9 L 22 9 L 22 10 L 22 11 L 26 11 L 26 12 L 26 13 L 26 26 L 22 26 L 22 14 L 10 14 L 10 26 L 6 26 L 6 13 L 6 12 L 6 11 L 10 11 L 10 10 L 10 9 L 14 9 L 14 8 L 14 7 z M 12 16 L 20 16 L 20 20 L 18 20 L 18 22 L 20 22 L 20 26 L 12 26 L 12 16 z"
-            ></path>
-          </svg>
+      <button
+        @click="changeScene(1)"
+        class="game-btn-gold p-3 cursor-pointer hover:-translate-y-1"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          x="0px"
+          y="0px"
+          width="100"
+          height="100"
+          viewBox="0 0 32 32"
+          fill="#fff"
+        >
+          <path
+            d="M 13 4 L 13 6 L 9 6 L 9 8 L 5 8 L 5 10 L 2 10 L 2 11 L 2 12 L 2 13 L 4 13 L 4 28 L 28 28 L 28 13 L 30 13 L 30 12 L 30 11 L 30 10 L 27 10 L 27 9 L 27 8 L 27 4 L 25 4 L 25 8 L 23 8 L 23 6 L 19 6 L 19 4 L 13 4 z M 14 7 L 18 7 L 18 8 L 18 9 L 22 9 L 22 10 L 22 11 L 26 11 L 26 12 L 26 13 L 26 26 L 22 26 L 22 14 L 10 14 L 10 26 L 6 26 L 6 13 L 6 12 L 6 11 L 10 11 L 10 10 L 10 9 L 14 9 L 14 8 L 14 7 z M 12 16 L 20 16 L 20 20 L 18 20 L 18 22 L 20 22 L 20 26 L 12 26 L 12 16 z"
+          ></path>
+        </svg>
       </button>
     </div>
   </div>
