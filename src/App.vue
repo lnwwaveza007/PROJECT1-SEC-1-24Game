@@ -155,6 +155,21 @@ const changeScene = (id) => {
     }, 1000);
   }, 1000);
 };
+
+const timer = ref({
+  max_time: 10,
+  left_time: 10,
+});
+
+const startCount = setInterval(() => {
+  if (currentScene.value === 0) {
+    timer.value.left_time--;
+    if (timer.value.left_time <= 0) {
+        result.star = -1;
+        changeScene(4);
+    }
+  }
+}, 1000);
 //Wave End
 //Boom Start
 import { lineCreate } from "./utils/lineCreate";
@@ -335,7 +350,7 @@ const nextStory = () => {
         class="w-12 h-12"
       />
     </div>
-    <div class="mx-auto w-[90%] h-[50vh] md:w-[60%] lg:w-[700px] dialog">
+    <div class="mb-20 mx-auto w-[90%] h-[50vh] md:w-[60%] lg:w-[700px] dialog">
       <div class="flex flex-col justify-center items-center h-full">
         <h1 class="text-3xl font-bold text-center mb-4">24GAME</h1>
 
@@ -405,6 +420,9 @@ const nextStory = () => {
             Revert
           </button>
         </div>
+      </div>
+      <div class="dialog justify-self-center p-4 mt-13">
+        <p>Timer : {{ timer.left_time }}</p>
       </div>
     </div>
   </div>
@@ -545,6 +563,7 @@ const nextStory = () => {
     class="h-screen w-screen flex justify-center items-center"
   >
     <div
+      v-if="result.star !== -1"
       class="result-box w-[90%] md:w-[70%] lg:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[5%] gap-10"
     >
       <div class="flex flex-row justify-center gap-7">
@@ -576,7 +595,52 @@ const nextStory = () => {
       </div>
       <button
         @click="changeScene(1)"
-        class="game-btn-gold p-3 cursor-pointer hover:-translate-y-1"
+        class="game-btn-gold pulse-animation p-3 cursor-pointer hover:-translate-y-1"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          x="0px"
+          y="0px"
+          width="100"
+          height="100"
+          viewBox="0 0 32 32"
+          fill="#fff"
+        >
+          <path
+            d="M 13 4 L 13 6 L 9 6 L 9 8 L 5 8 L 5 10 L 2 10 L 2 11 L 2 12 L 2 13 L 4 13 L 4 28 L 28 28 L 28 13 L 30 13 L 30 12 L 30 11 L 30 10 L 27 10 L 27 9 L 27 8 L 27 4 L 25 4 L 25 8 L 23 8 L 23 6 L 19 6 L 19 4 L 13 4 z M 14 7 L 18 7 L 18 8 L 18 9 L 22 9 L 22 10 L 22 11 L 26 11 L 26 12 L 26 13 L 26 26 L 22 26 L 22 14 L 10 14 L 10 26 L 6 26 L 6 13 L 6 12 L 6 11 L 10 11 L 10 10 L 10 9 L 14 9 L 14 8 L 14 7 z M 12 16 L 20 16 L 20 20 L 18 20 L 18 22 L 20 22 L 20 26 L 12 26 L 12 16 z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+    <div
+      v-else
+      class="result-box w-[90%] md:w-[70%] lg:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[5%] gap-10"
+    >
+      <div class="flex flex-row justify-center gap-7">
+        <img
+          v-for="(star, index) in 3"
+          src='/src/assets/result/star_empty.png'
+          class="w-30 h-30"
+          alt="star"
+        />
+      </div>
+      <div class="flex flex-col items-center gap-4">
+        <h1
+          class="text-[#ff4d4d] text-[38px]"
+          style="-webkit-text-stroke: 0.09em #b33818"
+        >
+          FAILED
+        </h1>
+        <h1
+          class="text-[#ff4d4d] text-[38px]"
+          style="-webkit-text-stroke: 0.09em #b33818"
+        >
+          TRY AGAIN
+        </h1>
+      </div>
+      <button
+        @click="changeScene(1)"
+        class="game-btn-gold pulse-animation p-3 cursor-pointer hover:-translate-y-1"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
