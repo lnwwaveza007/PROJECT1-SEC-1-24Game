@@ -65,12 +65,21 @@ const addOperator = (operator) => {
   }
 
   if (numbers.value.length === 1 && numbers.value[0] === 24) {
-    gameResult = calResult(health.value, { max_time: 60, left_time: 50 }, 1)
+    gameResult = calResult(health.value, timer, levelSelect.value);
     //Update Level
-    levelUnlocked++
-    localStorage.setItem("LevelUnlock",levelUnlocked)
+    levelUnlocked++;
+    localStorage.setItem("LevelUnlock", levelUnlocked);
+    //Update Passed Data
+    levelPassedData[`${levelSelect.value}`] = {
+      star: gameResult.star,
+      time: timer.value.max_time - timer.value.left_time,
+    };
+    localStorage.setItem("levelPassedData", JSON.stringify(levelPassedData));
     //Result Show
-    changeScene(4)
+    changeScene(4);
+  } else if ( numbers.value.length === 1 && numbers.value[0] !== 24 && health.value.current == 0) {
+    gameResult = { star: -1 };
+    changeScene(4);
   } else {
     message.value = "";
   }
@@ -140,6 +149,13 @@ import level from "./assets/data/level.json";
 
 const currentScene = ref(3);
 const isTransitioning = ref(false);
+let levelPassedData = localStorage.getItem("levelPassedData");
+
+if (levelPassedData == null) {
+  levelPassedData = {};
+} else {
+  levelPassedData = JSON.parse(levelPassedData);
+}
 
 const scenes = [
   { id: 0, name: "Main Game" },
@@ -172,8 +188,8 @@ const startCount = setInterval(() => {
   if (currentScene.value === 0) {
     timer.value.left_time--;
     if (timer.value.left_time <= 0) {
-        result.star = -1;
-        changeScene(4);
+      gameResult = { star: -1 };
+      changeScene(4);
     }
   }
 }, 1000);
@@ -195,19 +211,20 @@ const showPlay = ref(true);
 
 const levelSelect = ref(1);
 
-let levelUnlocked = localStorage.getItem("LevelUnlock")
+let levelUnlocked = localStorage.getItem("LevelUnlock");
 
 if (levelUnlocked == null) {
-  localStorage.setItem("LevelUnlock",1)
-}else {
-  levelUnlocked = Number(levelUnlocked)
+  localStorage.setItem("LevelUnlock", 1);
+} else {
+  levelUnlocked = Number(levelUnlocked);
 }
 
 watch(currentScene, (newValue) => {
   if (newValue !== 1) return;
-  document.getElementById("svg").style.zIndex = 15; //ปรับ z-index ให้เป็น 15 ให้เส้นแสดง
 
   setTimeout(() => {
+    document.getElementById("svg").style.zIndex = 15; //ปรับ z-index ให้เป็น 15 ให้เส้นแสดง
+
     // Create star lines
     const stars = document.getElementById("map").querySelectorAll("img");
     for (let i = 0; i < stars.length - 1; i++) {
@@ -226,18 +243,22 @@ watch(currentScene, (newValue) => {
 //move rocket
 function move(event) {
   // Level Skip Block
-  const targetLevel = starStyles.value.length - Number(event.target.id.replace("Star",""))
-  if (targetLevel != levelSelect.value+1 && targetLevel != levelSelect.value-1) {
-    alert("Can't Move To That Star")
+  const targetLevel =
+    starStyles.value.length - Number(event.target.id.replace("Star", ""));
+  if (
+    targetLevel != levelSelect.value + 1 &&
+    targetLevel != levelSelect.value - 1
+  ) {
+    alert("Can't Move To That Star");
     return;
   }
   // Check Unlocked Level
   if (targetLevel > levelUnlocked) {
-    alert("You need to complete the level in order")
+    alert("You need to complete the level in order");
     return;
   }
   // Set Selected Level
-  levelSelect.value = targetLevel
+  levelSelect.value = targetLevel;
   // Move Rocket
   showPlay.value = false;
   var x = event.x - 100;
@@ -422,7 +443,8 @@ const nextStory = () => {
   <!-- Wave Start -->
   <div
     v-if="isTransitioning"
-    class="fadeUptoDown-transition fixed inset-0 z-50 bg-black pointer-events-none"
+    class="fadeUptoDown-transition fixed inset-0 bg-black pointer-events-none"
+    style="z-index: 1000"
   ></div>
   <!-- Wave End -->
   <!-- Boom Start -->
@@ -450,10 +472,16 @@ const nextStory = () => {
       />
     </div>
 
-    <div id="rocket" class="absolute ml-[100px] flex flex-row gap-3 items-center"
-    style="z-index: 100;">
+    <div
+      id="rocket"
+      class="absolute ml-[100px] flex flex-row gap-3 items-center"
+      style="z-index: 100"
+    >
       <img class="w-[60px]" src="/icons/rocket.png" />
-      <div class="blue-dialog bounce-animation p-5 w-50 flex flex-col gap-2" v-show="showPlay">
+      <div
+        class="blue-dialog bounce-animation p-5 w-50 flex flex-col gap-3 justify-center items-center"
+        v-show="showPlay"
+      >
         <button
           class="bg-green-600 text-white px-2 rounded-md font-semibold"
           @click="startGame"
@@ -461,6 +489,26 @@ const nextStory = () => {
           Play
         </button>
         <p class="text-md">Level : {{ levelSelect }}</p>
+        <div class="flex flex-row gap-3 justify-center">
+          <img
+            v-if="levelPassedData[levelSelect]?.star == null"
+            v-for="(star, index) in 3"
+            src='/src/assets/result/star_empty.png'
+            class="w-10 h-10"
+            alt="star"
+          />
+          <img
+            v-else
+            v-for="(star, index) in 3"
+            :src="
+              index < levelPassedData[levelSelect].star
+                ? '/src/assets/result/star.png'
+                : '/src/assets/result/star_empty.png'"
+            class="w-10 h-10"
+            alt="star"
+          />
+        </div>
+        <p class="text-[10px]">Best Time : {{ levelPassedData[levelSelect] !== undefined ? levelPassedData[levelSelect].time+"s" : "---" }}</p>
       </div>
     </div>
   </div>
@@ -494,7 +542,7 @@ const nextStory = () => {
       24 GAME
     </h1>
     <div
-      class=" cursor-pointer font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10 mt-10"
+      class="cursor-pointer font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10 mt-10"
       @mouseover="hoverBtn($event, true)"
       @mouseleave="hoverBtn($event, false)"
       @click="changeScene(1)"
@@ -520,7 +568,7 @@ const nextStory = () => {
       >
     </div>
     <div
-      class=" cursor-pointer font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+      class="cursor-pointer font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
       @mouseover="hoverBtn($event, true)"
       @mouseleave="hoverBtn($event, false)"
       @click="changeScene(2)"
@@ -613,7 +661,7 @@ const nextStory = () => {
       <div class="flex flex-row justify-center gap-7">
         <img
           v-for="(star, index) in 3"
-          src='/src/assets/result/star_empty.png'
+          src="/src/assets/result/star_empty.png"
           class="w-30 h-30"
           alt="star"
         />
