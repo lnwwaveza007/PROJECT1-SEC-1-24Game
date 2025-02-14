@@ -12,7 +12,6 @@
 
 export function calResult(health, gameTime, level) {
     const score = (health.current * 25) + (gameTime.left_time / gameTime.max_time) * 25;
-    console.log(score);
     if (score >= 90) {
         return {
             star: 3,
