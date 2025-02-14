@@ -39,7 +39,7 @@
 |------|---------|---------|---------|---------|
 | 004  | - ออกแบบระบบการเล่นเกมและ Design หน้า Main game | - ทดสอบ function ของเกมจริงๆว่าตรงกับ Require ของทีมหรือไม่ | - แก้ไข function บางอย่างให้ตรงกับ Require ของทีม | waiting |
 | 012  | - ออกแบบระบบการเปลี่ยนหน้าและทดสอบ | - ทดสอบระบบการเปลี่ยนหน้ากับหน้าจริงๆ </br>-ทำระบบโยงเส้นในหน้าเลือกด่าน | - ทำ Responsive ให้กับหน้า Main Game</br>- ปรับเปลี่ยน Design หน้า Main game ให้เหมาะกับการทำ Reponsive  | waiting |
-| 015  | -ออกแบบDesignหน้าLevelUp , วางโครงสร้างStarsแต่ละดวง  |สร้างfunction rocket player โดยการทำให้มันขยับได้ทุกที่ที่กด | Update function rocket player ให้ไปแค่ตำแหน่งดาวที่กดเท่านั้น | เพิ่มfunction ปุ่ม Showplay ให้แสดงแค่เวลาที่กดไปที่ดาวแต่ละดวง -เพิ่มfunction selectLevel ให้แสดงLv1-8 บนดาว -Update ให้ไม่สามรถกดข้าม Level ได้ |
+| 015  | -ออกแบบDesignหน้าLevelUp  </br> -วางโครงสร้างStarsแต่ละดวง  |สร้างfunction rocket player โดยการทำให้มันขยับได้ทุกที่ที่กด | Update function rocket player ให้ไปแค่ตำแหน่งดาวที่กดเท่านั้น | -เพิ่มfunction ปุ่ม Showplay ให้แสดงแค่เวลาที่กดไปที่ดาวแต่ละดวง </br> -เพิ่มfunction selectLevel ให้แสดงLv1-8 บนดาว|
 | 024  | - ออกแบบหน้า main menu | - ทำหน้า main menu |  - ทำหน้า main menu </br> - วางแผนระบบหัวใจเพิ่มเติม  </br> - ออกแบบหน้า result | - ทำระบบหัวใจในหน้า main game </br> - ทำหน้า result |
 | 045  | waiting | waiting | waiting | waiting |
 
