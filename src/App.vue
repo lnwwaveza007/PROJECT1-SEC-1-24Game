@@ -65,7 +65,12 @@ const addOperator = (operator) => {
   }
 
   if (numbers.value.length === 1 && numbers.value[0] === 24) {
-    message.value = "Correct! The result is 24!";
+    gameResult = calResult(health.value, { max_time: 60, left_time: 50 }, 1)
+    //Update Level
+    levelUnlocked++
+    localStorage.setItem("LevelUnlock",levelUnlocked)
+    //Result Show
+    changeScene(4)
   } else {
     message.value = "";
   }
@@ -131,7 +136,9 @@ onMounted(() => {
 });
 //Kong End
 //Wave Start
-const currentScene = ref(0);
+import level from "./assets/data/level.json";
+
+const currentScene = ref(3);
 const isTransitioning = ref(false);
 
 const scenes = [
@@ -170,6 +177,16 @@ const startCount = setInterval(() => {
     }
   }
 }, 1000);
+
+const startGame = () => {
+  //Prepare Game
+  health.value.current = 3;
+  timer.value.max_time = level[levelSelect.value].time_max;
+  timer.value.left_time = timer.value.max_time;
+  generateNumbers();
+  //Change Scene
+  changeScene(0);
+};
 //Wave End
 //Boom Start
 import { lineCreate } from "./utils/lineCreate";
@@ -265,7 +282,7 @@ const health = ref({
   current: 1,
 });
 
-const result = calResult(health.value, { max_time: 60, left_time: 50 }, 1)
+let gameResult;
 //Chicha End
 //Tonpee Start
 const stories = ref([
@@ -306,25 +323,6 @@ const nextStory = () => {
 </script>
 
 <template>
-  <div class="bg-gray-800 p-4" style="z-index: 100">
-    <div class="flex items-center text-[12px]">
-      <h1 class="text-white font-bold">Scene Selector</h1>
-      <div class="flex">
-        <div v-for="scene in scenes" :key="scene.id">
-          <button
-            class="px-4 py-2 rounded-md text-white transition-colors duration-200 text-[10px]"
-            :class="{
-              'bg-red-500 hover:bg-red-600': activeSceneId === scene.id,
-              'bg-gray-700 hover:bg-gray-600': activeSceneId !== scene.id,
-            }"
-            @click="changeScene(scene.id)"
-          >
-            {{ scene.name }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
   <!-- Kong Start -->
   <div
     v-bind:hidden="currentScene !== 0"
@@ -409,12 +407,6 @@ const nextStory = () => {
         <div class="flex justify-center">
           <button
             class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded m-1"
-            @click="newGame"
-          >
-            New game
-          </button>
-          <button
-            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded m-1"
             @click="clear"
           >
             Revert
@@ -458,18 +450,18 @@ const nextStory = () => {
       />
     </div>
 
-    <div id="rocket" class="absolute ml-[100px]"
+    <div id="rocket" class="absolute ml-[100px] flex flex-row gap-3 items-center"
     style="z-index: 100;">
-      <div class="" v-show="showPlay">
+      <img class="w-[60px]" src="/icons/rocket.png" />
+      <div class="blue-dialog bounce-animation p-5 w-50 flex flex-col gap-2" v-show="showPlay">
         <button
-          class="bg-green-600 text-white px-2 rounded-md font-semibold bounce-animation"
+          class="bg-green-600 text-white px-2 rounded-md font-semibold"
+          @click="startGame"
         >
           Play
         </button>
         <p class="text-md">Level : {{ levelSelect }}</p>
       </div>
-
-      <img class="w-[15%]" src="/icons/rocket.png" />
     </div>
   </div>
   <!-- Boom End -->
@@ -502,9 +494,10 @@ const nextStory = () => {
       24 GAME
     </h1>
     <div
-      class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+      class=" cursor-pointer font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10 mt-10"
       @mouseover="hoverBtn($event, true)"
       @mouseleave="hoverBtn($event, false)"
+      @click="changeScene(1)"
     >
       <span
         v-show="MainMenuhover === 'playBtn'"
@@ -527,9 +520,10 @@ const nextStory = () => {
       >
     </div>
     <div
-      class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+      class=" cursor-pointer font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
       @mouseover="hoverBtn($event, true)"
       @mouseleave="hoverBtn($event, false)"
+      @click="changeScene(2)"
     >
       <span
         v-show="MainMenuhover === 'storyBtn'"
@@ -563,19 +557,19 @@ const nextStory = () => {
     class="h-screen w-screen flex justify-center items-center"
   >
     <div
-      v-if="result.star !== -1"
+      v-if="gameResult.star !== -1"
       class="result-box w-[90%] md:w-[70%] lg:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[5%] gap-10"
     >
       <div class="flex flex-row justify-center gap-7">
         <img
           v-for="(star, index) in 3"
           :src="
-            index < result.star
+            index < gameResult.star
               ? '/src/assets/result/star.png'
               : '/src/assets/result/star_empty.png'
           "
           class="w-30 h-30"
-          :class="index < result.star ? 'pulse-animation' : ''"
+          :class="index < gameResult.star ? 'pulse-animation' : ''"
           alt="star"
         />
       </div>
@@ -699,6 +693,13 @@ const nextStory = () => {
   background-size: 105% 105%;
   transition: translate 0.2s ease-out;
   cursor: pointer;
+}
+
+.blue-dialog {
+  border-image: url("./assets/level/blue-dialog.png");
+  border-image-slice: 13 fill;
+  border-image-width: 30px;
+  border-image-repeat: repeat;
 }
 
 .dialog {
