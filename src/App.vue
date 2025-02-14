@@ -87,7 +87,7 @@ const clear = () => {
     isNumberSelectable.value = true;
     //Health decrease
     health.value.current--;
-  }else {
+  } else {
     message.value = "You can't revert anymore";
   }
 };
@@ -160,6 +160,16 @@ import { lineCreate } from "./utils/lineCreate";
 
 const showPlay = ref(true);
 
+const levelSelect = ref(1);
+
+let levelUnlocked = localStorage.getItem("LevelUnlock")
+
+if (levelUnlocked == null) {
+  localStorage.setItem("LevelUnlock",1)
+}else {
+  levelUnlocked = Number(levelUnlocked)
+}
+
 watch(currentScene, (newValue) => {
   if (newValue !== 1) return;
   document.getElementById("svg").style.zIndex = 15; //ปรับ z-index ให้เป็น 15 ให้เส้นแสดง
@@ -182,6 +192,20 @@ watch(currentScene, (newValue) => {
 
 //move rocket
 function move(event) {
+  // Level Skip Block
+  const targetLevel = starStyles.value.length - Number(event.target.id.replace("Star",""))
+  if (targetLevel != levelSelect.value+1 && targetLevel != levelSelect.value-1) {
+    alert("Can't Move To That Star")
+    return;
+  }
+  // Check Unlocked Level
+  if (targetLevel > levelUnlocked) {
+    alert("You need to complete the level in order")
+    return;
+  }
+  // Set Selected Level
+  levelSelect.value = targetLevel
+  // Move Rocket
   showPlay.value = false;
   var x = event.x - 100;
   var y = event.y - 20;
@@ -190,7 +214,7 @@ function move(event) {
   rocket.style.top = y + "px";
   setTimeout(() => {
     showPlay.value = true;
-  },550)
+  }, 550);
 }
 
 // window.addEventListener("click", move);
@@ -262,7 +286,7 @@ const nextStory = () => {
 </script>
 
 <template>
-  <div class="bg-gray-800 p-4" style="z-index: 100;">
+  <div class="bg-gray-800 p-4" style="z-index: 100">
     <div class="flex items-center text-[12px]">
       <h1 class="text-white font-bold">Scene Selector</h1>
       <div class="flex">
@@ -293,10 +317,16 @@ const nextStory = () => {
     "
   >
     <!-- Heart UI -->
-    <div class="heartbg flex justify-center items-center mb-15 gap-5 px-13 py-6">
+    <div
+      class="heartbg flex justify-center items-center mb-15 gap-5 px-13 py-6"
+    >
       <img
         v-for="number in health.max"
-        :src="number <= health.current ? '/src/assets/main-game/heart_full.png' : '/src/assets/main-game/heart_empty.png'"
+        :src="
+          number <= health.current
+            ? '/src/assets/main-game/heart_full.png'
+            : '/src/assets/main-game/heart_empty.png'
+        "
         class="w-12 h-12"
       />
     </div>
@@ -400,12 +430,18 @@ const nextStory = () => {
       />
     </div>
 
-    <div id="rocket" class="absolute w-[3%] ml-[100px] z-20">
-      <button v-show="showPlay" class="bg-green-600 text-white px-2 rounded-md font-semibold">
-        Play
-      </button>
+    <div id="rocket" class="absolute ml-[100px]"
+    style="z-index: 100;">
+      <div class="" v-show="showPlay">
+        <button
+          class="bg-green-600 text-white px-2 rounded-md font-semibold bounce-animation"
+        >
+          Play
+        </button>
+        <p class="text-md">Level : {{ levelSelect }}</p>
+      </div>
 
-      <img src="/icons/rocket.png" />
+      <img class="w-[15%]" src="/icons/rocket.png" />
     </div>
   </div>
   <!-- Boom End -->
@@ -552,6 +588,19 @@ div {
 
 #rocket {
   transition: left 0.5s ease-out, top 0.5s ease-out;
+}
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.bounce-animation {
+  animation: bounce 1s infinite;
 }
 /* Boom End */
 /* Chica Start */
