@@ -70,6 +70,14 @@ const addOperator = (operator) => {
     levelUnlocked++;
     localStorage.setItem("LevelUnlock", levelUnlocked);
     //Update Passed Data
+    if (levelPassedData[`${levelSelect.value}`] != null) {
+      if (gameResult.star > levelPassedData[`${levelSelect.value}`].star || timer.value.max_time - timer.value.left_time < levelPassedData[`${levelSelect.value}`].time) {
+        levelPassedData[`${levelSelect.value}`] = {
+          star: gameResult.star,
+          time: timer.value.max_time - timer.value.left_time,
+        };
+      }
+    }
     levelPassedData[`${levelSelect.value}`] = {
       star: gameResult.star,
       time: timer.value.max_time - timer.value.left_time,
