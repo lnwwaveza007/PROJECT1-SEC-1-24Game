@@ -1,6 +1,6 @@
 <script setup>
 //Kong Start
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed, watch, watchEffect } from "vue";
 
 const numbers = ref([]);
 const storeNumbers = ref([]);
@@ -316,18 +316,22 @@ let gameResult;
 //Tonpee Start
 const stories = ref([
   {
-    image:
-      "/storys/friend-talking-and-other-friend-responding-with-funny-v0-f2csx8gx8gzc1.webp",
-    text: "This is the beginning of your adventure.",
+    id: 1,
+    image: "/storys/story1.webp",
+    text: "Start your adventure.",
+    unlocked: true,
   },
   {
-    image:
-      "/storys/friend-talking-and-other-friend-responding-with-funny-v0-zf4h79gx8gzc1.webp",
-    text: "You encountered a mysterious stranger.",
+    id: 2,
+    image: "/storys/story2.jpeg",
+    text: "Meet a stranger.",
+    unlocked: false,
   },
   {
-    image: "/storys/images.jpeg",
-    text: "A challenge awaits you ahead.",
+    id: 3,
+    image: "/storys/story3.webp",
+    text: "A challenge ahead.",
+    unlocked: false,
   },
 ]);
 
@@ -348,6 +352,22 @@ const nextStory = () => {
     }, 1000);
   }
 };
+
+const storyText = computed(() => {
+  const currentStory = stories.value[currentStoryIndex.value];
+  return currentStory.unlocked
+    ? currentStory.text
+    : "You have to clear game stage for unlock";
+});
+
+const loadStoryStatus = () => {
+  stories.value.forEach((story) => {
+    const unlocked = localStorage.getItem(`story_${story.id}`);
+    story.unlocked = unlocked === "true";
+  });
+};
+
+onMounted(loadStoryStatus);
 //Tonpee End
 </script>
 
@@ -522,15 +542,23 @@ const nextStory = () => {
   </div>
   <!-- Boom End -->
   <!-- Tonpee Start-->
-  <div v-if="currentScene === 2" class="flex flex-col items-center">
-    <img :src="stories[currentStoryIndex].image" class="w-1/2" />
-    <p class="text-xl mt-4">{{ stories[currentStoryIndex].text }}</p>
-    <button
-      v-text="storyButton"
-      @click="nextStory"
-      class="px-4 py-2 bg-blue-500 text-white rounded-md mt-4"
-    ></button>
+
+  <div v-if="currentScene === 2" class="story-container">
+    <div v-if="stories[currentStoryIndex]" class="story-wrapper">
+      <div
+        v-if="stories[currentStoryIndex].unlocked"
+        class="story-image-wrapper"
+      >
+        <img :src="stories[currentStoryIndex].image" class="story-image" />
+      </div>
+      <div v-else class="story-wrapper story-lock-wrapper">
+        <img src="/public/icons/lock.png" class="lock-icon" />
+      </div>
+      <p class="story-text">{{ storyText }}</p>
+      <button @click="nextStory" class="story-button">{{ storyButton }}</button>
+    </div>
   </div>
+
   <!-- Tonpee End -->
   <!-- Chicha Start -->
   <!-- Main Menu -->
@@ -858,5 +886,82 @@ div {
 }
 /* Chica End */
 /* Tonpee Start */
+
+.story-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  min-height: 500px;
+}
+
+.story-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 200px;
+  margin-bottom: 20px;
+}
+
+.story-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: auto;
+}
+
+.story-lock-wrapper {
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.story-image {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 10px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.lock-icon {
+  width: 50px;
+  height: 50px;
+  opacity: 0.8;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.story-text {
+  font-size: 1.2rem;
+  margin-top: 15px;
+  color: #333;
+}
+
+.story-button {
+  padding: 12px 25px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+  border: none;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
 /* Tonpee End */
 </style>
