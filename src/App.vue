@@ -65,7 +65,29 @@ const addOperator = (operator) => {
   }
 
   if (numbers.value.length === 1 && numbers.value[0] === 24) {
-    message.value = "Correct! The result is 24!";
+    gameResult = calResult(health.value, timer, levelSelect.value);
+    //Update Level
+    levelUnlocked++;
+    localStorage.setItem("LevelUnlock", levelUnlocked);
+    //Update Passed Data
+    if (levelPassedData[`${levelSelect.value}`] != null) {
+      if (gameResult.star > levelPassedData[`${levelSelect.value}`].star || timer.value.max_time - timer.value.left_time < levelPassedData[`${levelSelect.value}`].time) {
+        levelPassedData[`${levelSelect.value}`] = {
+          star: gameResult.star,
+          time: timer.value.max_time - timer.value.left_time,
+        };
+      }
+    }
+    levelPassedData[`${levelSelect.value}`] = {
+      star: gameResult.star,
+      time: timer.value.max_time - timer.value.left_time,
+    };
+    localStorage.setItem("levelPassedData", JSON.stringify(levelPassedData));
+    //Result Show
+    changeScene(4);
+  } else if ( numbers.value.length === 1 && numbers.value[0] !== 24 && health.value.current == 0) {
+    gameResult = { star: -1 };
+    changeScene(4);
   } else {
     message.value = "";
   }
@@ -131,8 +153,17 @@ onMounted(() => {
 });
 //Kong End
 //Wave Start
-const currentScene = ref(0);
+import level from "./assets/data/level.json";
+
+const currentScene = ref(3);
 const isTransitioning = ref(false);
+let levelPassedData = localStorage.getItem("levelPassedData");
+
+if (levelPassedData == null) {
+  levelPassedData = {};
+} else {
+  levelPassedData = JSON.parse(levelPassedData);
+}
 
 const scenes = [
   { id: 0, name: "Main Game" },
@@ -155,15 +186,53 @@ const changeScene = (id) => {
     }, 1000);
   }, 1000);
 };
+
+const timer = ref({
+  max_time: 10,
+  left_time: 10,
+});
+
+const startCount = setInterval(() => {
+  if (currentScene.value === 0) {
+    timer.value.left_time--;
+    if (timer.value.left_time <= 0) {
+      gameResult = { star: -1 };
+      changeScene(4);
+    }
+  }
+}, 1000);
+
+const startGame = () => {
+  //Prepare Game
+  health.value.current = 3;
+  timer.value.max_time = level[levelSelect.value].time_max;
+  timer.value.left_time = timer.value.max_time;
+  generateNumbers();
+  //Change Scene
+  changeScene(0);
+};
 //Wave End
 //Boom Start
 import { lineCreate } from "./utils/lineCreate";
 
+const showPlay = ref(true);
+
+const levelSelect = ref(1);
+
+let levelUnlocked = localStorage.getItem("LevelUnlock");
+
+if (levelUnlocked == null) {
+  localStorage.setItem("LevelUnlock", 1);
+} else {
+  levelUnlocked = Number(levelUnlocked);
+}
+
 watch(currentScene, (newValue) => {
   if (newValue !== 1) return;
-  document.getElementById("svg").style.zIndex = 15; //ปรับ z-index ให้เป็น 15 ให้เส้นแสดง
 
   setTimeout(() => {
+    document.getElementById("svg").style.zIndex = 15; //ปรับ z-index ให้เป็น 15 ให้เส้นแสดง
+
     // Create star lines
     const stars = document.getElementById("map").querySelectorAll("img");
     for (let i = 0; i < stars.length - 1; i++) {
@@ -181,12 +250,33 @@ watch(currentScene, (newValue) => {
 
 //move rocket
 function move(event) {
-  console.log("move");
+  // Level Skip Block
+  const targetLevel =
+    starStyles.value.length - Number(event.target.id.replace("Star", ""));
+  if (
+    targetLevel != levelSelect.value + 1 &&
+    targetLevel != levelSelect.value - 1
+  ) {
+    alert("Can't Move To That Star");
+    return;
+  }
+  // Check Unlocked Level
+  if (targetLevel > levelUnlocked) {
+    alert("You need to complete the level in order");
+    return;
+  }
+  // Set Selected Level
+  levelSelect.value = targetLevel;
+  // Move Rocket
+  showPlay.value = false;
   var x = event.x - 100;
   var y = event.y - 20;
   var rocket = document.getElementById("rocket");
   rocket.style.left = x + "px";
   rocket.style.top = y + "px";
+  setTimeout(() => {
+    showPlay.value = true;
+  }, 550);
 }
 
 // window.addEventListener("click", move);
@@ -204,6 +294,8 @@ const starStyles = ref([
 
 //Boom End
 //Chicha Start
+import { calResult } from "./utils/resultCal";
+
 let MainMenuhover = ref("");
 
 const hoverBtn = (event, isHover) => {
@@ -216,13 +308,10 @@ const hoverBtn = (event, isHover) => {
 
 const health = ref({
   max: 3,
-  current: 3,
+  current: 1,
 });
 
-const result = {
-  star: 2,
-  level: 1,
-};
+let gameResult;
 //Chicha End
 //Tonpee Start
 const stories = ref([
@@ -283,25 +372,6 @@ onMounted(loadStoryStatus);
 </script>
 
 <template>
-  <div class="bg-gray-800 p-4">
-    <div class="flex items-center text-[12px]">
-      <h1 class="text-white font-bold">Scene Selector</h1>
-      <div class="flex">
-        <div v-for="scene in scenes" :key="scene.id">
-          <button
-            class="px-4 py-2 rounded-md text-white transition-colors duration-200 text-[10px]"
-            :class="{
-              'bg-red-500 hover:bg-red-600': activeSceneId === scene.id,
-              'bg-gray-700 hover:bg-gray-600': activeSceneId !== scene.id,
-            }"
-            @click="changeScene(scene.id)"
-          >
-            {{ scene.name }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
   <!-- Kong Start -->
   <div
     v-bind:hidden="currentScene !== 0"
@@ -327,7 +397,7 @@ onMounted(loadStoryStatus);
         class="w-12 h-12"
       />
     </div>
-    <div class="mx-auto w-[90%] h-[50vh] md:w-[60%] lg:w-[700px] dialog">
+    <div class="mb-20 mx-auto w-[90%] h-[50vh] md:w-[60%] lg:w-[700px] dialog">
       <div class="flex flex-col justify-center items-center h-full">
         <h1 class="text-3xl font-bold text-center mb-4">24GAME</h1>
 
@@ -386,17 +456,14 @@ onMounted(loadStoryStatus);
         <div class="flex justify-center">
           <button
             class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded m-1"
-            @click="newGame"
-          >
-            New game
-          </button>
-          <button
-            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded m-1"
             @click="clear"
           >
             Revert
           </button>
         </div>
+      </div>
+      <div class="dialog justify-self-center p-4 mt-13">
+        <p>Timer : {{ timer.left_time }}</p>
       </div>
     </div>
   </div>
@@ -404,7 +471,8 @@ onMounted(loadStoryStatus);
   <!-- Wave Start -->
   <div
     v-if="isTransitioning"
-    class="fadeUptoDown-transition fixed inset-0 z-50 bg-black pointer-events-none"
+    class="fadeUptoDown-transition fixed inset-0 bg-black pointer-events-none"
+    style="z-index: 1000"
   ></div>
   <!-- Wave End -->
   <!-- Boom Start -->
@@ -432,12 +500,44 @@ onMounted(loadStoryStatus);
       />
     </div>
 
-    <div id="rocket" class="absolute w-[3%] ml-[100px] z-20">
-      <button class="bg-green-600 text-white px-2 rounded-md font-semibold">
-        Play
-      </button>
-
-      <img src="/icons/rocket.png" />
+    <div
+      id="rocket"
+      class="absolute ml-[100px] flex flex-row gap-3 items-center"
+      style="z-index: 100"
+    >
+      <img class="w-[60px]" src="/icons/rocket.png" />
+      <div
+        class="blue-dialog bounce-animation p-5 w-50 flex flex-col gap-3 justify-center items-center"
+        v-show="showPlay"
+      >
+        <button
+          class="bg-green-600 text-white px-2 rounded-md font-semibold"
+          @click="startGame"
+        >
+          Play
+        </button>
+        <p class="text-md">Level : {{ levelSelect }}</p>
+        <div class="flex flex-row gap-3 justify-center">
+          <img
+            v-if="levelPassedData[levelSelect]?.star == null"
+            v-for="(star, index) in 3"
+            src='/src/assets/result/star_empty.png'
+            class="w-10 h-10"
+            alt="star"
+          />
+          <img
+            v-else
+            v-for="(star, index) in 3"
+            :src="
+              index < levelPassedData[levelSelect].star
+                ? '/src/assets/result/star.png'
+                : '/src/assets/result/star_empty.png'"
+            class="w-10 h-10"
+            alt="star"
+          />
+        </div>
+        <p class="text-[10px]">Best Time : {{ levelPassedData[levelSelect] !== undefined ? levelPassedData[levelSelect].time+"s" : "---" }}</p>
+      </div>
     </div>
   </div>
   <!-- Boom End -->
@@ -478,9 +578,10 @@ onMounted(loadStoryStatus);
       24 GAME
     </h1>
     <div
-      class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+      class="cursor-pointer font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10 mt-10"
       @mouseover="hoverBtn($event, true)"
       @mouseleave="hoverBtn($event, false)"
+      @click="changeScene(1)"
     >
       <span
         v-show="MainMenuhover === 'playBtn'"
@@ -503,9 +604,10 @@ onMounted(loadStoryStatus);
       >
     </div>
     <div
-      class="font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+      class="cursor-pointer font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
       @mouseover="hoverBtn($event, true)"
       @mouseleave="hoverBtn($event, false)"
+      @click="changeScene(2)"
     >
       <span
         v-show="MainMenuhover === 'storyBtn'"
@@ -539,18 +641,19 @@ onMounted(loadStoryStatus);
     class="h-screen w-screen flex justify-center items-center"
   >
     <div
+      v-if="gameResult.star !== -1"
       class="result-box w-[90%] md:w-[70%] lg:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[5%] gap-10"
     >
       <div class="flex flex-row justify-center gap-7">
         <img
           v-for="(star, index) in 3"
           :src="
-            index < result.star
+            index < gameResult.star
               ? '/src/assets/result/star.png'
               : '/src/assets/result/star_empty.png'
           "
           class="w-30 h-30"
-          :class="index < result.star ? 'pulse-animation' : ''"
+          :class="index < gameResult.star ? 'pulse-animation' : ''"
           alt="star"
         />
       </div>
@@ -570,7 +673,52 @@ onMounted(loadStoryStatus);
       </div>
       <button
         @click="changeScene(1)"
-        class="game-btn-gold p-3 cursor-pointer hover:-translate-y-1"
+        class="game-btn-gold pulse-animation p-3 cursor-pointer hover:-translate-y-1"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          x="0px"
+          y="0px"
+          width="100"
+          height="100"
+          viewBox="0 0 32 32"
+          fill="#fff"
+        >
+          <path
+            d="M 13 4 L 13 6 L 9 6 L 9 8 L 5 8 L 5 10 L 2 10 L 2 11 L 2 12 L 2 13 L 4 13 L 4 28 L 28 28 L 28 13 L 30 13 L 30 12 L 30 11 L 30 10 L 27 10 L 27 9 L 27 8 L 27 4 L 25 4 L 25 8 L 23 8 L 23 6 L 19 6 L 19 4 L 13 4 z M 14 7 L 18 7 L 18 8 L 18 9 L 22 9 L 22 10 L 22 11 L 26 11 L 26 12 L 26 13 L 26 26 L 22 26 L 22 14 L 10 14 L 10 26 L 6 26 L 6 13 L 6 12 L 6 11 L 10 11 L 10 10 L 10 9 L 14 9 L 14 8 L 14 7 z M 12 16 L 20 16 L 20 20 L 18 20 L 18 22 L 20 22 L 20 26 L 12 26 L 12 16 z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+    <div
+      v-else
+      class="result-box w-[90%] md:w-[70%] lg:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[5%] gap-10"
+    >
+      <div class="flex flex-row justify-center gap-7">
+        <img
+          v-for="(star, index) in 3"
+          src="/src/assets/result/star_empty.png"
+          class="w-30 h-30"
+          alt="star"
+        />
+      </div>
+      <div class="flex flex-col items-center gap-4">
+        <h1
+          class="text-[#ff4d4d] text-[38px]"
+          style="-webkit-text-stroke: 0.09em #b33818"
+        >
+          FAILED
+        </h1>
+        <h1
+          class="text-[#ff4d4d] text-[38px]"
+          style="-webkit-text-stroke: 0.09em #b33818"
+        >
+          TRY AGAIN
+        </h1>
+      </div>
+      <button
+        @click="changeScene(1)"
+        class="game-btn-gold pulse-animation p-3 cursor-pointer hover:-translate-y-1"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -631,6 +779,13 @@ onMounted(loadStoryStatus);
   cursor: pointer;
 }
 
+.blue-dialog {
+  border-image: url("./assets/level/blue-dialog.png");
+  border-image-slice: 13 fill;
+  border-image-width: 30px;
+  border-image-repeat: repeat;
+}
+
 .dialog {
   border-image: url("./assets/main-game/24game/dialog-bg.png");
   border-image-slice: 13 fill;
@@ -683,6 +838,19 @@ div {
 
 #rocket {
   transition: left 0.5s ease-out, top 0.5s ease-out;
+}
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.bounce-animation {
+  animation: bounce 1s infinite;
 }
 /* Boom End */
 /* Chica Start */
