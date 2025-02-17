@@ -71,7 +71,11 @@ const addOperator = (operator) => {
     localStorage.setItem("LevelUnlock", levelUnlocked);
     //Update Passed Data
     if (levelPassedData[`${levelSelect.value}`] != null) {
-      if (gameResult.star > levelPassedData[`${levelSelect.value}`].star || timer.value.max_time - timer.value.left_time < levelPassedData[`${levelSelect.value}`].time) {
+      if (
+        gameResult.star > levelPassedData[`${levelSelect.value}`].star ||
+        timer.value.max_time - timer.value.left_time <
+          levelPassedData[`${levelSelect.value}`].time
+      ) {
         levelPassedData[`${levelSelect.value}`] = {
           star: gameResult.star,
           time: timer.value.max_time - timer.value.left_time,
@@ -85,7 +89,11 @@ const addOperator = (operator) => {
     localStorage.setItem("levelPassedData", JSON.stringify(levelPassedData));
     //Result Show
     changeScene(4);
-  } else if ( numbers.value.length === 1 && numbers.value[0] !== 24 && health.value.current == 0) {
+  } else if (
+    numbers.value.length === 1 &&
+    numbers.value[0] !== 24 &&
+    health.value.current == 0
+  ) {
     gameResult = { star: -1 };
     changeScene(4);
   } else {
@@ -241,7 +249,7 @@ watch(currentScene, (newValue) => {
     // Move player(rocket) to start
     var player = document.getElementById("rocket");
     var startingPoint = document.getElementById(
-      `Star${starStyles.value.length - 1}`
+      `Star${starStyles.value.length - levelSelect.value}`
     );
     player.style.left = startingPoint.getBoundingClientRect().left - 45 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
     player.style.top = startingPoint.getBoundingClientRect().top + "px";
@@ -336,38 +344,38 @@ const stories = ref([
 ]);
 
 const currentStoryIndex = ref(0);
-const storyButton = ref("NEXT");
+const hiddenNext = ref(false);
 
-const nextStory = () => {
-  if (currentStoryIndex.value < stories.value.length - 2) {
-    currentStoryIndex.value++;
-  } else if (currentStoryIndex.value < stories.value.length - 1) {
-    storyButton.value = "EXIT";
-    currentStoryIndex.value++;
-  } else {
-    changeScene(0);
-    setTimeout(() => {
-      storyButton.value = "NEXT";
-      currentStoryIndex.value = 0;
-    }, 1000);
+const changeStoryScene = (action) => {
+  if (action === "next") {
+    if (currentStoryIndex.value < stories.value.length - 1) {
+      currentStoryIndex.value++;
+      if (currentStoryIndex.value === stories.value.length - 1) {
+        hiddenNext.value = true;
+      }
+    }
+  } else if (action === "back") {
+    if (currentStoryIndex.value > 0) {
+      currentStoryIndex.value--;
+      hiddenNext.value = false;
+    }
   }
 };
 
 const storyText = computed(() => {
   const currentStory = stories.value[currentStoryIndex.value];
-  return currentStory.unlocked
+  return levelUnlocked >= currentStory.id
     ? currentStory.text
     : "You have to clear game stage for unlock";
 });
 
-const loadStoryStatus = () => {
-  stories.value.forEach((story) => {
-    const unlocked = localStorage.getItem(`story_${story.id}`);
-    story.unlocked = unlocked === "true";
-  });
+const backToMainMenu = () => {
+  if (currentScene.value === 2) {
+    currentStoryIndex.value = 0;
+    hiddenNext.value = false;
+  }
+  changeScene(3);
 };
-
-onMounted(loadStoryStatus);
 //Tonpee End
 </script>
 
@@ -521,7 +529,7 @@ onMounted(loadStoryStatus);
           <img
             v-if="levelPassedData[levelSelect]?.star == null"
             v-for="(star, index) in 3"
-            src='/src/assets/result/star_empty.png'
+            src="/src/assets/result/star_empty.png"
             class="w-10 h-10"
             alt="star"
           />
@@ -531,12 +539,20 @@ onMounted(loadStoryStatus);
             :src="
               index < levelPassedData[levelSelect].star
                 ? '/src/assets/result/star.png'
-                : '/src/assets/result/star_empty.png'"
+                : '/src/assets/result/star_empty.png'
+            "
             class="w-10 h-10"
             alt="star"
           />
         </div>
-        <p class="text-[10px]">Best Time : {{ levelPassedData[levelSelect] !== undefined ? levelPassedData[levelSelect].time+"s" : "---" }}</p>
+        <p class="text-[10px]">
+          Best Time :
+          {{
+            levelPassedData[levelSelect] !== undefined
+              ? levelPassedData[levelSelect].time + "s"
+              : "---"
+          }}
+        </p>
       </div>
     </div>
   </div>
@@ -546,7 +562,7 @@ onMounted(loadStoryStatus);
   <div v-if="currentScene === 2" class="story-container">
     <div v-if="stories[currentStoryIndex]" class="story-wrapper">
       <div
-        v-if="stories[currentStoryIndex].unlocked"
+        v-if="levelUnlocked >= stories[currentStoryIndex].id"
         class="story-image-wrapper"
       >
         <img :src="stories[currentStoryIndex].image" class="story-image" />
@@ -555,8 +571,23 @@ onMounted(loadStoryStatus);
         <img src="/public/icons/lock.png" class="lock-icon" />
       </div>
       <p class="story-text">{{ storyText }}</p>
-      <button @click="nextStory" class="story-button">{{ storyButton }}</button>
+      <div class="button-story-stage">
+        <button @click="changeStoryScene('back')" class="back-story-button">
+          BACK
+        </button>
+        <button
+          v-show="!hiddenNext"
+          @click="changeStoryScene('next')"
+          class="story-button"
+        >
+          NEXT
+        </button>
+      </div>
     </div>
+  </div>
+
+  <div v-if="currentScene === 2 || currentScene === 1" class="menu-button-wrapper">
+    <button class="menu-button" @click="backToMainMenu">MENU</button>
   </div>
 
   <!-- Tonpee End -->
@@ -897,14 +928,20 @@ div {
   margin: 0 auto;
   text-align: center;
   min-height: 500px;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 .story-wrapper {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  min-height: 200px;
-  margin-bottom: 20px;
+  min-height: 250px;
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .story-image-wrapper {
@@ -912,32 +949,35 @@ div {
   justify-content: center;
   align-items: center;
   width: 100%;
+}
+
+.story-image {
+  width: 100%;
+  max-width: 350px;
   height: auto;
+  border-radius: 8px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.story-image:hover {
+  transform: scale(1.05);
 }
 
 .story-lock-wrapper {
   position: relative;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.story-image {
-  width: 100%;
-  max-width: 400px;
-  height: auto;
-  border-radius: 10px;
-  transition: transform 0.3s ease-in-out;
+  padding: 20px;
+  border-radius: 12px;
 }
 
 .lock-icon {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   opacity: 0.8;
   position: absolute;
   top: 50%;
@@ -947,20 +987,88 @@ div {
 
 .story-text {
   font-size: 1.2rem;
-  margin-top: 15px;
-  color: #333;
+  margin-top: 20px;
+  color: #222;
+  font-weight: bold;
 }
 
-.story-button {
-  padding: 12px 25px;
-  background-color: #007bff;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
+.button-story-stage {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
   margin-top: 20px;
-  border: none;
+}
+
+.story-button,
+.back-story-button {
+  padding: 10px 20px;
   font-size: 1rem;
-  transition: background-color 0.3s;
+  font-weight: bold;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s ease-in-out;
+}
+
+.story-button:hover,
+.back-story-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.menu-button-wrapper {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 9999; 
+}
+
+.menu-button {
+  padding: 8px 16px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.menu-button:hover {
+  background-color: #b52b3a;
+  transform: scale(1.05);
+}
+
+@media (max-width: 480px) {
+  .story-container {
+    min-height: 400px;
+  }
+  .story-text {
+    font-size: 1rem;
+  }
+  .story-button,
+  .back-story-button {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+  .menu-button {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Tonpee End */
