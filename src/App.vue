@@ -243,8 +243,8 @@ watch(currentScene, (newValue) => {
     var startingPoint = document.getElementById(
       `Star${starStyles.value.length - 1}`
     );
-    player.style.left = startingPoint.getBoundingClientRect().left - 45 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
-    player.style.top = startingPoint.getBoundingClientRect().top + "px";
+    player.style.left = startingPoint.getBoundingClientRect().left - 60 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
+    player.style.top = startingPoint.getBoundingClientRect().top - 50 + "px";
   }, 500);
 });
 
@@ -282,14 +282,14 @@ function move(event) {
 // window.addEventListener("click", move);
 
 const starStyles = ref([
-  { width: "8%", left: "80px" },
-  { width: "20%", left: "-300px" },
-  { width: "20%", left: "100px" },
-  { width: "20%", left: "-460px" },
-  { width: "20%", left: "100px" },
-  { width: "20%", left: "-450px" },
-  { width: "20%", left: "-150px" },
-  { width: "20%", left: "140px" },
+  { width: "8%", left: "50%" },
+  { width: "20%", left: "-60%" },
+  { width: "20%", left: "30%" },
+  { width: "20%", left: "-50%" },
+  { width: "20%", left: "10%" },
+  { width: "20%", left: "-30%" },
+  { width: "20%", left: "-15%" },
+  { width: "20%", left: "20%" },
 ]);
 
 //Boom End
