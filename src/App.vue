@@ -411,14 +411,6 @@ const backToMainMenu = () => {
 </script>
 
 <template>
-  <div>
-    <p>Change Scene</p>
-    <button @click="changeScene(0)">Main Game</button>
-    <button @click="changeScene(1)">Level Up</button>
-    <button @click="changeScene(2)">Story</button>
-    <button @click="changeScene(3)">Main Menu</button>
-    <button @click="changeScene(4)">Result</button>n
-  </div>
   <!-- Kong Start -->
   <div
     v-bind:hidden="currentScene !== 0"
@@ -1083,7 +1075,7 @@ div {
   position: absolute;
   top: 10px;
   left: 10px;
-  z-index: 9999; 
+  z-index: 60; 
 }
 
 .menu-button {
