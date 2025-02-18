@@ -1,6 +1,6 @@
 <script setup>
 //Kong Start
-import { ref, onMounted, computed, watch, watchEffect } from "vue";
+import { ref, onMounted, computed, watch, watchEffect, nextTick } from "vue";
 
 const numbers = ref([]);
 const storeNumbers = ref([]);
@@ -67,7 +67,10 @@ const addOperator = (operator) => {
   if (numbers.value.length === 1 && numbers.value[0] === 24) {
     gameResult = calResult(health.value, timer.value, levelSelect.value);
     //Update Level
-    levelUnlocked = levelSelect.value + 1;
+    if (levelUnlocked <= levelSelect.value) {
+      noti("You have unlocked new story! check it now ✨", 5000)
+      levelUnlocked = levelSelect.value + 1;
+    }
     localStorage.setItem("LevelUnlock", levelUnlocked);
     //Update Passed Data
     if (levelPassedData[`${levelSelect.value}`] != null) {
@@ -210,6 +213,27 @@ const startCount = setInterval(() => {
   }
 }, 1000);
 
+const notification = ref({
+  show: false,
+  message: "",
+});
+
+const notiElement = ref(null);
+
+function noti(message, time) {
+  notification.value.message = message;
+  notification.value.show = true;
+  nextTick(() => {
+    notiElement.value.classList.add("notification-show");
+    setTimeout(() => {
+      notiElement.value.classList.add("notification-dismiss");
+      setTimeout(() => {
+        notification.value.show = false;
+      }, 300);
+    }, time);
+  });
+}
+
 const startGame = () => {
   //Prepare Game
   health.value.current = 3;
@@ -233,6 +257,7 @@ let levelUnlocked = localStorage.getItem("LevelUnlock");
 
 if (levelUnlocked == null) {
   localStorage.setItem("LevelUnlock", 1);
+  levelUnlocked = 1;
 } else {
   levelUnlocked = Number(levelUnlocked);
 }
@@ -272,8 +297,8 @@ function createLine(changeScene = false) {
       // Move player(rocket) to start
       var player = document.getElementById("rocket");
       var startingPoint = document.getElementById(
-        `Star${starStyles.value.length - 1}`
-      );
+      `Star${starStyles.value.length - levelSelect.value}`
+    );
       player.style.left =
         startingPoint.getBoundingClientRect().left - 80 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
       player.style.top = startingPoint.getBoundingClientRect().top + "px";
@@ -295,12 +320,12 @@ function move(event) {
     targetLevel != levelSelect.value + 1 &&
     targetLevel != levelSelect.value - 1
   ) {
-    alert("Can't Move To That Star");
+    noti("Hey slow down! only one step each 🪜", 1500);
     return;
   }
   // Check Unlocked Level
   if (targetLevel > levelUnlocked) {
-    alert("You need to complete the level in order");
+    noti("You need to complete the previous level first 🚀", 1500);
     return;
   }
   // Set Selected Level
@@ -359,7 +384,7 @@ import stories from "./assets/data/story";
 const currentStoryIndex = ref(0);
 const hiddenNext = ref(false);
 
-const storyText = ref('');
+const storyText = ref("");
 const typeTracker = ref(false);
 
 const soundPlayer = ref(null);
@@ -387,24 +412,23 @@ watch([currentStoryIndex, currentScene], () => {
   const currentStory = stories[currentStoryIndex.value];
   if (levelUnlocked >= currentStory.level) {
     typeWriter(storyText, currentStory.text, 50, typeTracker);
-  }else {
-    storyText.value = "You need to complete the next level to unlock this story";
+  } else {
+    storyText.value =
+      "You need to complete the next level to unlock this story";
   }
 });
 
 const backToMainMenu = () => {
   if (currentScene.value === 2) {
-    currentStoryIndex.value = 0;
     hiddenNext.value = false;
   }
   changeScene(3);
 };
 
-
 onMounted(() => {
   soundManager.init(soundPlayer, soundSource);
-  playSceneSound(0)
-})
+  playSceneSound(0);
+});
 
 const clickButton = () => {
   soundManager.play("click");
@@ -415,12 +439,21 @@ const adjustVolume = () => {
 };
 
 const playSceneSound = (noSound) => {
-  soundManager.play(`scene${noSound}`)
-}
+  soundManager.play(`scene${noSound}`);
+};
 //Tonpee End
 </script>
 
 <template>
+  <!-- Notification -->
+  <div v-if="notification.show" class="fixed flex justify-center items-center pt-15 lg:pt-5 w-full">
+    <div
+      ref="notiElement"
+      class="notification flex justify-center items-center py-3 px-5"
+    >
+      <p class="text-[6px] min-[376px]:text-[8px] md:text-[12px]">{{ notification.message }}</p>
+    </div>
+  </div>
   <!-- Kong Start -->
   <div
     v-bind:hidden="currentScene !== 0"
@@ -578,7 +611,9 @@ const playSceneSound = (noSound) => {
       >
         Play
       </button>
-      <p class="text-md px-3 text-[9px] min-[321px]:text-[10px] md:text-sm">{{ level[levelSelect].name }}</p>
+      <p class="text-md px-3 text-[9px] min-[321px]:text-[10px] md:text-sm">
+        {{ level[levelSelect].name }}
+      </p>
       <div class="flex flex-row gap-3 justify-center">
         <img
           v-if="levelPassedData[levelSelect]?.star == null"
@@ -623,17 +658,23 @@ const playSceneSound = (noSound) => {
   </audio>
 
   <div v-if="currentScene === 2" class="story-container">
-    <div v-if="stories[currentStoryIndex]" class="story-wrapper">
+    <div
+      v-if="stories[currentStoryIndex]"
+      class="story-wrapper w-[95%] md:w-[90%] lg:w-[80%] xl:w-[60%]"
+    >
       <div
         v-if="levelUnlocked >= stories[currentStoryIndex].level"
         class="story-image-wrapper"
       >
         <img :src="stories[currentStoryIndex].image" class="story-image" />
       </div>
-      <div v-else class="story-wrapper story-lock-wrapper">
+      <div v-else class="story-lock-wrapper h-50">
         <img src="/public/icons/lock.png" class="lock-icon" />
       </div>
-      <p v-text="storyText" class="story-text"></p>
+      <p
+        v-text="storyText"
+        class="story-text text-[12px] md:text-[14px] lg:text-[16px] xl:text-[18px]"
+      ></p>
       <div class="button-story-stage">
         <button
           @click="
@@ -720,7 +761,6 @@ const playSceneSound = (noSound) => {
         class="text-[#ffd100]"
         style="-webkit-text-stroke: 0.07em #2e1b5b"
         @click="clickButton"
-
       >
         Play
       </h2>
@@ -942,6 +982,39 @@ div {
 /* Kong Start */
 /* Kong End */
 /* Wave Start */
+.notification {
+  border-image: url("./assets/main-game/24game/dialog-bg.png");
+  border-image-slice: 13 fill;
+  border-image-width: 30px;
+  border-image-repeat: repeat;
+}
+
+.notification-show {
+  animation: popUp 0.3s ease-out forwards;
+}
+
+.notification-dismiss {
+  animation: popDown 0.3s ease-out forwards;
+}
+
+@keyframes popDown {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes popUp {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 @keyframes fadeUptoDown {
   0% {
     clip-path: inset(0 0 100% 0);
@@ -1028,12 +1101,14 @@ div {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 90%;
-  max-width: 600px;
-  margin: 0 auto;
+  align-items: center;
+  height: 100vh;
   text-align: center;
-  min-height: 500px;
   animation: fadeIn 0.5s ease-in-out;
+  background-image: url("./assets/story/story-bg.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .story-wrapper {
@@ -1041,12 +1116,13 @@ div {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
   min-height: 250px;
-  padding: 20px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 50px;
+  gap: 5px;
+  border-image: url("./assets/main-game/24game/dialog-bg.png");
+  border-image-slice: 13 fill;
+  border-image-width: 30px;
+  border-image-repeat: repeat;
 }
 
 .story-image-wrapper {
@@ -1058,7 +1134,7 @@ div {
 
 .story-image {
   width: 100%;
-  max-width: 350px;
+  max-width: 600px;
   height: auto;
   border-radius: 8px;
   transition: transform 0.3s ease-in-out;
@@ -1075,8 +1151,6 @@ div {
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 100%;
-  padding: 20px;
   border-radius: 12px;
 }
 
@@ -1091,10 +1165,8 @@ div {
 }
 
 .story-text {
-  font-size: 1.2rem;
   margin-top: 20px;
   color: #222;
-  font-weight: bold;
 }
 
 .button-story-stage {
@@ -1162,9 +1234,6 @@ div {
 @media (max-width: 480px) {
   .story-container {
     min-height: 400px;
-  }
-  .story-text {
-    font-size: 1rem;
   }
   .story-button,
   .back-story-button {
