@@ -67,7 +67,7 @@ const addOperator = (operator) => {
   if (numbers.value.length === 1 && numbers.value[0] === 24) {
     gameResult = calResult(health.value, timer.value, levelSelect.value);
     //Update Level
-    levelUnlocked++;
+    levelUnlocked = levelSelect.value + 1;
     localStorage.setItem("LevelUnlock", levelUnlocked);
     //Update Passed Data
     if (levelPassedData[`${levelSelect.value}`] != null) {
@@ -352,18 +352,22 @@ const health = ref({
 let gameResult;
 //Chicha End
 //Tonpee Start
+import { typeWriter } from "./utils/typeWriter";
 import { soundManager } from "./utils/soundManager";
 import stories from "./assets/data/story";
 
 const currentStoryIndex = ref(0);
 const hiddenNext = ref(false);
 
+const storyText = ref('');
+const typeTracker = ref(false);
+
 const soundPlayer = ref(null);
 const soundSource = ref(null);
 const volume = ref(1);
 
 const changeStoryScene = (action) => {
-
+  if (typeTracker.value) return;
   if (action === "next") {
     if (currentStoryIndex.value < Object.keys(stories).length - 1) {
       currentStoryIndex.value++;
@@ -379,11 +383,13 @@ const changeStoryScene = (action) => {
   }
 };
 
-const storyText = computed(() => {
+watch([currentStoryIndex, currentScene], () => {
   const currentStory = stories[currentStoryIndex.value];
-  return levelUnlocked >= currentStory.level
-    ? currentStory.text
-    : "You have to clear game stage for unlock";
+  if (levelUnlocked >= currentStory.level) {
+    typeWriter(storyText, currentStory.text, 50, typeTracker);
+  }else {
+    storyText.value = "You need to complete the next level to unlock this story";
+  }
 });
 
 const backToMainMenu = () => {
@@ -411,10 +417,6 @@ const adjustVolume = () => {
 const playSceneSound = (noSound) => {
   soundManager.play(`scene${noSound}`)
 }
-
-
-
-
 //Tonpee End
 </script>
 
@@ -631,7 +633,7 @@ const playSceneSound = (noSound) => {
       <div v-else class="story-wrapper story-lock-wrapper">
         <img src="/public/icons/lock.png" class="lock-icon" />
       </div>
-      <p class="story-text">{{ storyText }}</p>
+      <p v-text="storyText" class="story-text"></p>
       <div class="button-story-stage">
         <button
           @click="
