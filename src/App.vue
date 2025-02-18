@@ -644,10 +644,10 @@ const backToMainMenu = () => {
       background-size: cover;
       background-position: center center;
     "
-    class="h-screen w-screen flex flex-col items-center pt-50 gap-7"
+    class="h-screen w-screen just flex flex-col items-center pt-50 gap-7"
   >
     <h1
-      class="text-6xl text-[#ffd100] pixelFont"
+      class="text-3xl min-[321px]:text-5xl md:text-6xl text-[#ffd100] pixelFont"
       style="-webkit-text-stroke: 0.07em #2e1b5b"
     >
       24 GAME
