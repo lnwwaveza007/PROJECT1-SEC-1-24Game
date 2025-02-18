@@ -353,6 +353,8 @@ const health = ref({
 let gameResult;
 //Chicha End
 //Tonpee Start
+import { soundManager } from "@/utils/soundManager.js";
+
 const stories = ref([
   {
     id: 1,
@@ -376,6 +378,10 @@ const stories = ref([
 
 const currentStoryIndex = ref(0);
 const hiddenNext = ref(false);
+
+const soundPlayer = ref("");
+const soundSource = ref("");
+const volume = ref(1);
 
 const changeStoryScene = (action) => {
   if (action === "next") {
@@ -407,6 +413,17 @@ const backToMainMenu = () => {
   }
   changeScene(3);
 };
+
+soundManager.init(soundPlayer, soundSource);
+
+const clickButton = () => {
+  soundManager.play("click");
+};
+
+const adjustVolume = () => {
+  soundManager.setVolume(volume.value);
+};
+
 //Tonpee End
 </script>
 
@@ -556,12 +573,15 @@ const backToMainMenu = () => {
 
     <div
       class="blue-dialog bounce-animation w-[90%] md:w-110 h-50 mt-5 flex flex-col gap-3 justify-center items-center"
-      style="z-index: 100;"
+      style="z-index: 100"
       v-show="showPlay"
     >
       <button
         class="bg-green-600 text-white px-2 rounded-md font-semibold"
-        @click="startGame"
+        @click="
+          startGame();
+          clickButton();
+        "
       >
         Play
       </button>
@@ -605,6 +625,10 @@ const backToMainMenu = () => {
   <!-- Boom End -->
   <!-- Tonpee Start-->
 
+  <audio controls ref="soundPlayer" id="soundManager" hidden>
+    <source :src="soundSource" type="audio/mp3" />
+  </audio>
+
   <div v-if="currentScene === 2" class="story-container">
     <div v-if="stories[currentStoryIndex]" class="story-wrapper">
       <div
@@ -618,12 +642,21 @@ const backToMainMenu = () => {
       </div>
       <p class="story-text">{{ storyText }}</p>
       <div class="button-story-stage">
-        <button @click="changeStoryScene('back')" class="back-story-button">
+        <button
+          @click="
+            changeStoryScene('back');
+            clickButton();
+          "
+          class="back-story-button"
+        >
           BACK
         </button>
         <button
           v-show="!hiddenNext"
-          @click="changeStoryScene('next')"
+          @click="
+            changeStoryScene('next');
+            clickButton();
+          "
           class="story-button"
         >
           NEXT
@@ -632,8 +665,31 @@ const backToMainMenu = () => {
     </div>
   </div>
 
-  <div v-if="currentScene === 2 || currentScene === 1" class="menu-button-wrapper">
-    <button class="menu-button" @click="backToMainMenu">MENU</button>
+  <div
+    v-if="currentScene === 2 || currentScene === 1"
+    class="menu-button-wrapper"
+  >
+    <button
+      class="menu-button"
+      @click="
+        backToMainMenu();
+        clickButton();
+      "
+    >
+      MENU
+    </button>
+  </div>
+  <div v-if="currentScene === 3" class="volume-control">
+    <label>Volume:</label>
+    <input
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
+      v-model="volume"
+      @input="adjustVolume"
+    />
+    <span>{{ Math.round(volume * 100) }}%</span>
   </div>
 
   <!-- Tonpee End -->
@@ -670,6 +726,8 @@ const backToMainMenu = () => {
         id="playBtn"
         class="text-[#ffd100]"
         style="-webkit-text-stroke: 0.07em #2e1b5b"
+        @click="clickButton"
+
       >
         Play
       </h2>
@@ -696,6 +754,7 @@ const backToMainMenu = () => {
         id="storyBtn"
         class="text-4xl text-[#ffd100]"
         style="-webkit-text-stroke: 0.07em #2e1b5b"
+        @click="clickButton"
       >
         Story
       </h2>
@@ -1075,7 +1134,7 @@ div {
   position: absolute;
   top: 10px;
   left: 10px;
-  z-index: 60; 
+  z-index: 60;
 }
 
 .menu-button {
@@ -1093,6 +1152,18 @@ div {
 .menu-button:hover {
   background-color: #b52b3a;
   transform: scale(1.05);
+}
+
+.volume-control {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: white;
+  text-align: center;
 }
 
 @media (max-width: 480px) {
