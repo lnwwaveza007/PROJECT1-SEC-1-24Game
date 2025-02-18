@@ -239,7 +239,6 @@ if (levelUnlocked == null) {
 
 watch(currentScene, (newValue) => {
   if (newValue !== 1) return;
-
   createLine(true);
 });
 
@@ -379,8 +378,8 @@ const stories = ref([
 const currentStoryIndex = ref(0);
 const hiddenNext = ref(false);
 
-const soundPlayer = ref("");
-const soundSource = ref("");
+const soundPlayer = ref(null);
+const soundSource = ref(null);
 const volume = ref(1);
 
 const changeStoryScene = (action) => {
@@ -414,7 +413,11 @@ const backToMainMenu = () => {
   changeScene(3);
 };
 
-soundManager.init(soundPlayer, soundSource);
+
+onMounted(() => {
+  soundManager.init(soundPlayer, soundSource);
+  playSceneSound(0)
+})
 
 const clickButton = () => {
   soundManager.play("click");
@@ -423,6 +426,13 @@ const clickButton = () => {
 const adjustVolume = () => {
   soundManager.setVolume(volume.value);
 };
+
+const playSceneSound = (noSound) => {
+  soundManager.play(`scene${noSound}`)
+}
+
+
+
 
 //Tonpee End
 </script>

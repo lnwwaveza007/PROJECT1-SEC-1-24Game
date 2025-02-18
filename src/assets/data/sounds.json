@@ -1,5 +1,8 @@
 {
     "click" : {
         "path" : "/public/sounds/click.mp3"
+    },
+    "scene0" : {
+        "path" : "/public/sounds/scene0.mp3"
     }
 }
