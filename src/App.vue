@@ -71,7 +71,11 @@ const addOperator = (operator) => {
     localStorage.setItem("LevelUnlock", levelUnlocked);
     //Update Passed Data
     if (levelPassedData[`${levelSelect.value}`] != null) {
-      if (gameResult.star > levelPassedData[`${levelSelect.value}`].star || timer.value.max_time - timer.value.left_time < levelPassedData[`${levelSelect.value}`].time) {
+      if (
+        gameResult.star > levelPassedData[`${levelSelect.value}`].star ||
+        timer.value.max_time - timer.value.left_time <
+          levelPassedData[`${levelSelect.value}`].time
+      ) {
         levelPassedData[`${levelSelect.value}`] = {
           star: gameResult.star,
           time: timer.value.max_time - timer.value.left_time,
@@ -85,7 +89,11 @@ const addOperator = (operator) => {
     localStorage.setItem("levelPassedData", JSON.stringify(levelPassedData));
     //Result Show
     changeScene(4);
-  } else if ( numbers.value.length === 1 && numbers.value[0] !== 24 && health.value.current == 0) {
+  } else if (
+    numbers.value.length === 1 &&
+    numbers.value[0] !== 24 &&
+    health.value.current == 0
+  ) {
     gameResult = { star: -1 };
     changeScene(4);
   } else {
@@ -215,6 +223,8 @@ const startGame = () => {
 //Boom Start
 import { lineCreate } from "./utils/lineCreate";
 
+const resize = ref(false);
+
 const showPlay = ref(true);
 
 const levelSelect = ref(1);
@@ -230,8 +240,13 @@ if (levelUnlocked == null) {
 watch(currentScene, (newValue) => {
   if (newValue !== 1) return;
 
-  setTimeout(() => {
-    document.getElementById("svg").style.zIndex = 15; //ปรับ z-index ให้เป็น 15 ให้เส้นแสดง
+  createLine(true);
+});
+
+function createLine(changeScene = false) {
+  if (changeScene == false) {
+    document.getElementById("svg").innerHTML = "";
+    document.getElementById("svg").style.zIndex = 50; //ปรับ z-index ให้เป็น 15 ให้เส้นแสดง
 
     // Create star lines
     const stars = document.getElementById("map").querySelectorAll("img");
@@ -243,9 +258,33 @@ watch(currentScene, (newValue) => {
     var startingPoint = document.getElementById(
       `Star${starStyles.value.length - 1}`
     );
-    player.style.left = startingPoint.getBoundingClientRect().left - 60 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
-    player.style.top = startingPoint.getBoundingClientRect().top - 50 + "px";
-  }, 500);
+    player.style.left = startingPoint.getBoundingClientRect().left - 80 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
+    player.style.top = startingPoint.getBoundingClientRect().top + "px";
+  } else {
+    setTimeout(() => {
+      document.getElementById("svg").innerHTML = "";
+      document.getElementById("svg").style.zIndex = 50; //ปรับ z-index ให้เป็น 15 ให้เส้นแสดง
+
+      // Create star lines
+      const stars = document.getElementById("map").querySelectorAll("img");
+      for (let i = 0; i < stars.length - 1; i++) {
+        lineCreate(stars[i], stars[i + 1]);
+      }
+      // Move player(rocket) to start
+      var player = document.getElementById("rocket");
+      var startingPoint = document.getElementById(
+        `Star${starStyles.value.length - 1}`
+      );
+      player.style.left =
+        startingPoint.getBoundingClientRect().left - 80 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
+      player.style.top = startingPoint.getBoundingClientRect().top + "px";
+    }, 500);
+  }
+}
+
+// For resize
+window.addEventListener("resize", () => {
+  createLine(false);
 });
 
 //move rocket
@@ -269,8 +308,8 @@ function move(event) {
   levelSelect.value = targetLevel;
   // Move Rocket
   showPlay.value = false;
-  var x = event.x - 100;
-  var y = event.y - 20;
+  var x = event.target.x - 100;
+  var y = event.target.y - 10;
   var rocket = document.getElementById("rocket");
   rocket.style.left = x + "px";
   rocket.style.top = y + "px";
@@ -282,14 +321,14 @@ function move(event) {
 // window.addEventListener("click", move);
 
 const starStyles = ref([
-  { width: "8%", left: "50%" },
-  { width: "20%", left: "-60%" },
-  { width: "20%", left: "30%" },
-  { width: "20%", left: "-50%" },
-  { width: "20%", left: "10%" },
-  { width: "20%", left: "-30%" },
-  { width: "20%", left: "-15%" },
-  { width: "20%", left: "20%" },
+  { width: "50%", left: "50%" },
+  { width: "40%", left: "-60%" },
+  { width: "40%", left: "30%" },
+  { width: "40%", left: "-50%" },
+  { width: "40%", left: "10%" },
+  { width: "40%", left: "-30%" },
+  { width: "40%", left: "-15%" },
+  { width: "40%", left: "20%" },
 ]);
 
 //Boom End
@@ -478,7 +517,7 @@ onMounted(loadStoryStatus);
   <!-- Boom Start -->
   <div
     v-bind:hidden="currentScene !== 1"
-    class="min-h-screen bg-gray-100 flex items-center justify-center font-sans text-gray-800"
+    class="min-h-screen bg-gray-100 flex flex-col items-center justify-center font-sans text-gray-800"
     style="
       background-image: url(/src/assets/Background2.png);
       background-size: cover;
@@ -487,16 +526,23 @@ onMounted(loadStoryStatus);
   >
     <svg style="z-index: -1" id="svg"></svg>
 
-    <div id="map" class="flex flex-col items-center z-50">
+    <div
+      id="map"
+      class="py-20 px-22 min-[321px]:px-27 min-[376px]:px-32 md:px-50 flex flex-col items-center"
+    >
       <!-- ปรับ z-index ให้เป็น 50 มากกว่า svg -->
       <img
         v-for="(style, index) in starStyles"
         :key="index"
         :style="{ width: style.width, marginLeft: style.left, zIndex: 50 }"
-        :src="index === 0 ? '/icons/dimond.png' : '/icons/star.png'"
+        :src="
+          index === 0
+            ? '/src/assets/level/diamond.png'
+            : '/src/assets/level/fight.png'
+        "
         :id="`Star${index}`"
         @click="move"
-        class="transition-transform duration-300 hover:scale-180"
+        class="transition-transform duration-300 hover:scale-180 z-60"
       />
     </div>
 
@@ -505,39 +551,53 @@ onMounted(loadStoryStatus);
       class="absolute ml-[100px] flex flex-row gap-3 items-center"
       style="z-index: 100"
     >
-      <img class="w-[60px]" src="/icons/rocket.png" />
-      <div
-        class="blue-dialog bounce-animation p-5 w-50 flex flex-col gap-3 justify-center items-center"
-        v-show="showPlay"
+      <img class="w-[40px]" src="/src/assets/level/rocket.png" />
+    </div>
+    <div
+      class="blue-dialog bounce-animation w-[90%] md:w-110 h-50 mt-5 flex flex-col gap-3 justify-center items-center"
+      v-show="showPlay"
+    >
+      <button
+        class="bg-green-600 text-white px-2 rounded-md font-semibold"
+        @click="startGame"
       >
-        <button
-          class="bg-green-600 text-white px-2 rounded-md font-semibold"
-          @click="startGame"
-        >
-          Play
-        </button>
-        <p class="text-md">Level : {{ levelSelect }}</p>
-        <div class="flex flex-row gap-3 justify-center">
-          <img
-            v-if="levelPassedData[levelSelect]?.star == null"
-            v-for="(star, index) in 3"
-            src='/src/assets/result/star_empty.png'
-            class="w-10 h-10"
-            alt="star"
-          />
-          <img
-            v-else
-            v-for="(star, index) in 3"
-            :src="
-              index < levelPassedData[levelSelect].star
-                ? '/src/assets/result/star.png'
-                : '/src/assets/result/star_empty.png'"
-            class="w-10 h-10"
-            alt="star"
-          />
-        </div>
-        <p class="text-[10px]">Best Time : {{ levelPassedData[levelSelect] !== undefined ? levelPassedData[levelSelect].time+"s" : "---" }}</p>
+        Play
+      </button>
+      <p class="text-md">Level : {{ levelSelect }}</p>
+      <div class="flex flex-row gap-3 justify-center">
+        <img
+          v-if="levelPassedData[levelSelect]?.star == null"
+          v-for="(star, index) in 3"
+          src="/src/assets/result/star_empty.png"
+          class="w-10 h-10"
+          alt="star"
+        />
+        <img
+          v-else
+          v-for="(star, index) in 3"
+          :src="
+            index < levelPassedData[levelSelect].star
+              ? '/src/assets/result/star.png'
+              : '/src/assets/result/star_empty.png'
+          "
+          class="w-10 h-10"
+          alt="star"
+        />
       </div>
+      <p class="text-[10px]">
+        Best Time :
+        {{
+          levelPassedData[levelSelect] !== undefined
+            ? levelPassedData[levelSelect].time + "s"
+            : "---"
+        }}
+      </p>
+    </div>
+    <div
+      class="blue-dialog bounce-animation mt-5 w-[90%] md:w-110 h-50 flex flex-col gap-3 justify-center items-center"
+      v-show="!showPlay"
+    >
+      <p class="text-md">Moving...</p>
     </div>
   </div>
   <!-- Boom End -->
@@ -851,6 +911,13 @@ div {
 
 .bounce-animation {
   animation: bounce 1s infinite;
+}
+
+#map {
+  border-image: url("./assets/level/book-bg.png");
+  border-image-slice: 75 fill;
+  border-image-width: 40px;
+  border-image-repeat: repeat;
 }
 /* Boom End */
 /* Chica Start */
