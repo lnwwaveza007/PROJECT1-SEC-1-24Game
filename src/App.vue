@@ -411,6 +411,14 @@ const backToMainMenu = () => {
 </script>
 
 <template>
+  <div>
+    <p>Change Scene</p>
+    <button @click="changeScene(0)">Main Game</button>
+    <button @click="changeScene(1)">Level Up</button>
+    <button @click="changeScene(2)">Story</button>
+    <button @click="changeScene(3)">Main Menu</button>
+    <button @click="changeScene(4)">Result</button>n
+  </div>
   <!-- Kong Start -->
   <div
     v-bind:hidden="currentScene !== 0"
@@ -719,7 +727,7 @@ const backToMainMenu = () => {
   >
     <div
       v-if="gameResult.star !== -1"
-      class="result-box w-[90%] md:w-[70%] lg:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[5%] gap-10"
+      class="result-box w-[95%] md:w-[70%] lg:w-[70%] xl:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[30%] md:pt-[8%] lg:pt-[5%] gap-10"
     >
       <div class="flex flex-row justify-center gap-7">
         <img
@@ -729,20 +737,20 @@ const backToMainMenu = () => {
               ? '/src/assets/result/star.png'
               : '/src/assets/result/star_empty.png'
           "
-          class="w-30 h-30"
+          class="w-12 h-12 min-[321px]:w-15 min-[321px]:h-15 md:w-28 md:h-28 lg:w-30 lg:h-30"
           :class="index < gameResult.star ? 'pulse-animation' : ''"
           alt="star"
         />
       </div>
       <div class="flex flex-col items-center gap-4">
         <h1
-          class="text-[#ffe14d] text-[38px]"
+          class="text-[#ffe14d] text-[23px] min-[321px]:text-[25px] md:text-[38px]"
           style="-webkit-text-stroke: 0.09em #b33818"
         >
           LEVEL
         </h1>
         <h1
-          class="text-[#ffe14d] text-[38px]"
+          class="text-[#ffe14d] text-[23px] min-[321px]:text-[25px] md:text-[38px]"
           style="-webkit-text-stroke: 0.09em #b33818"
         >
           COMPLETED
@@ -769,25 +777,25 @@ const backToMainMenu = () => {
     </div>
     <div
       v-else
-      class="result-box w-[90%] md:w-[70%] lg:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[5%] gap-10"
+      class="result-box w-[95%] md:w-[70%] lg:w-[70%] xl:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[30%] md:pt-[8%] lg:pt-[5%] gap-10"
     >
       <div class="flex flex-row justify-center gap-7">
         <img
           v-for="(star, index) in 3"
           src="/src/assets/result/star_empty.png"
-          class="w-30 h-30"
+          class="w-12 h-12 min-[321px]:w-15 min-[321px]:h-15 md:w-28 md:h-28 lg:w-30 lg:h-30"
           alt="star"
         />
       </div>
       <div class="flex flex-col items-center gap-4">
         <h1
-          class="text-[#ff4d4d] text-[38px]"
+          class="text-[#ff4d4d] text-[23px] min-[321px]:text-[25px] md:text-[38px]"
           style="-webkit-text-stroke: 0.09em #b33818"
         >
           FAILED
         </h1>
         <h1
-          class="text-[#ff4d4d] text-[38px]"
+          class="text-[#ff4d4d] text-[23px] min-[321px]:text-[25px] md:text-[38px]"
           style="-webkit-text-stroke: 0.09em #b33818"
         >
           TRY AGAIN
