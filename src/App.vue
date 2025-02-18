@@ -65,7 +65,7 @@ const addOperator = (operator) => {
   }
 
   if (numbers.value.length === 1 && numbers.value[0] === 24) {
-    gameResult = calResult(health.value, timer, levelSelect.value);
+    gameResult = calResult(health.value, timer.value, levelSelect.value);
     //Update Level
     levelUnlocked++;
     localStorage.setItem("LevelUnlock", levelUnlocked);
@@ -553,8 +553,10 @@ const backToMainMenu = () => {
     >
       <img class="w-[40px]" src="/src/assets/level/rocket.png" />
     </div>
+
     <div
       class="blue-dialog bounce-animation w-[90%] md:w-110 h-50 mt-5 flex flex-col gap-3 justify-center items-center"
+      style="z-index: 100;"
       v-show="showPlay"
     >
       <button
@@ -644,10 +646,10 @@ const backToMainMenu = () => {
       background-size: cover;
       background-position: center center;
     "
-    class="h-screen w-screen flex flex-col items-center pt-50 gap-7"
+    class="h-screen w-screen just flex flex-col items-center pt-50 gap-7"
   >
     <h1
-      class="text-6xl text-[#ffd100] pixelFont"
+      class="text-3xl min-[321px]:text-5xl md:text-6xl text-[#ffd100] pixelFont"
       style="-webkit-text-stroke: 0.07em #2e1b5b"
     >
       24 GAME
@@ -717,7 +719,7 @@ const backToMainMenu = () => {
   >
     <div
       v-if="gameResult.star !== -1"
-      class="result-box w-[90%] md:w-[70%] lg:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[5%] gap-10"
+      class="result-box w-[95%] md:w-[70%] lg:w-[70%] xl:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[30%] md:pt-[8%] lg:pt-[5%] gap-10"
     >
       <div class="flex flex-row justify-center gap-7">
         <img
@@ -727,20 +729,20 @@ const backToMainMenu = () => {
               ? '/src/assets/result/star.png'
               : '/src/assets/result/star_empty.png'
           "
-          class="w-30 h-30"
+          class="w-12 h-12 min-[321px]:w-15 min-[321px]:h-15 md:w-28 md:h-28 lg:w-30 lg:h-30"
           :class="index < gameResult.star ? 'pulse-animation' : ''"
           alt="star"
         />
       </div>
       <div class="flex flex-col items-center gap-4">
         <h1
-          class="text-[#ffe14d] text-[38px]"
+          class="text-[#ffe14d] text-[23px] min-[321px]:text-[25px] md:text-[38px]"
           style="-webkit-text-stroke: 0.09em #b33818"
         >
           LEVEL
         </h1>
         <h1
-          class="text-[#ffe14d] text-[38px]"
+          class="text-[#ffe14d] text-[23px] min-[321px]:text-[25px] md:text-[38px]"
           style="-webkit-text-stroke: 0.09em #b33818"
         >
           COMPLETED
@@ -767,25 +769,25 @@ const backToMainMenu = () => {
     </div>
     <div
       v-else
-      class="result-box w-[90%] md:w-[70%] lg:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[5%] gap-10"
+      class="result-box w-[95%] md:w-[70%] lg:w-[70%] xl:w-[50%] h-[70vh] bg-white flex flex-col items-center pt-[30%] md:pt-[8%] lg:pt-[5%] gap-10"
     >
       <div class="flex flex-row justify-center gap-7">
         <img
           v-for="(star, index) in 3"
           src="/src/assets/result/star_empty.png"
-          class="w-30 h-30"
+          class="w-12 h-12 min-[321px]:w-15 min-[321px]:h-15 md:w-28 md:h-28 lg:w-30 lg:h-30"
           alt="star"
         />
       </div>
       <div class="flex flex-col items-center gap-4">
         <h1
-          class="text-[#ff4d4d] text-[38px]"
+          class="text-[#ff4d4d] text-[23px] min-[321px]:text-[25px] md:text-[38px]"
           style="-webkit-text-stroke: 0.09em #b33818"
         >
           FAILED
         </h1>
         <h1
-          class="text-[#ff4d4d] text-[38px]"
+          class="text-[#ff4d4d] text-[23px] min-[321px]:text-[25px] md:text-[38px]"
           style="-webkit-text-stroke: 0.09em #b33818"
         >
           TRY AGAIN
@@ -1073,7 +1075,7 @@ div {
   position: absolute;
   top: 10px;
   left: 10px;
-  z-index: 9999; 
+  z-index: 60; 
 }
 
 .menu-button {
