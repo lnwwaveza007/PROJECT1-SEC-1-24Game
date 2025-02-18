@@ -353,35 +353,16 @@ const health = ref({
 let gameResult;
 //Chicha End
 //Tonpee Start
-const stories = ref([
-  {
-    id: 1,
-    image: "/storys/story1.webp",
-    text: "Start your adventure.",
-    unlocked: true,
-  },
-  {
-    id: 2,
-    image: "/storys/story2.jpeg",
-    text: "Meet a stranger.",
-    unlocked: false,
-  },
-  {
-    id: 3,
-    image: "/storys/story3.webp",
-    text: "A challenge ahead.",
-    unlocked: false,
-  },
-]);
+import stories from "./assets/data/story";
 
 const currentStoryIndex = ref(0);
 const hiddenNext = ref(false);
 
-const changeStoryScene = (action) => {
+const changestoriescene = (action) => {
   if (action === "next") {
-    if (currentStoryIndex.value < stories.value.length - 1) {
+    if (currentStoryIndex.value < Object.keys(stories).length - 1) {
       currentStoryIndex.value++;
-      if (currentStoryIndex.value === stories.value.length - 1) {
+      if (currentStoryIndex.value === Object.keys(stories).length - 1) {
         hiddenNext.value = true;
       }
     }
@@ -394,8 +375,8 @@ const changeStoryScene = (action) => {
 };
 
 const storyText = computed(() => {
-  const currentStory = stories.value[currentStoryIndex.value];
-  return levelUnlocked >= currentStory.id
+  const currentStory = stories[currentStoryIndex.value];
+  return levelUnlocked >= currentStory.level
     ? currentStory.text
     : "You have to clear game stage for unlock";
 });
@@ -608,7 +589,7 @@ const backToMainMenu = () => {
   <div v-if="currentScene === 2" class="story-container">
     <div v-if="stories[currentStoryIndex]" class="story-wrapper">
       <div
-        v-if="levelUnlocked >= stories[currentStoryIndex].id"
+        v-if="levelUnlocked >= stories[currentStoryIndex].level"
         class="story-image-wrapper"
       >
         <img :src="stories[currentStoryIndex].image" class="story-image" />
@@ -618,12 +599,12 @@ const backToMainMenu = () => {
       </div>
       <p class="story-text">{{ storyText }}</p>
       <div class="button-story-stage">
-        <button @click="changeStoryScene('back')" class="back-story-button">
+        <button @click="changestoriescene('back')" class="back-story-button">
           BACK
         </button>
         <button
           v-show="!hiddenNext"
-          @click="changeStoryScene('next')"
+          @click="changestoriescene('next')"
           class="story-button"
         >
           NEXT
