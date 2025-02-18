@@ -352,6 +352,7 @@ const health = ref({
 let gameResult;
 //Chicha End
 //Tonpee Start
+import { soundManager } from "./utils/soundManager";
 import stories from "./assets/data/story";
 
 const currentStoryIndex = ref(0);
@@ -575,7 +576,7 @@ const playSceneSound = (noSound) => {
       >
         Play
       </button>
-      <p class="text-md">Level : {{ levelSelect }}</p>
+      <p class="text-md px-3 text-[9px] min-[321px]:text-[10px] md:text-sm">{{ level[levelSelect].name }}</p>
       <div class="flex flex-row gap-3 justify-center">
         <img
           v-if="levelPassedData[levelSelect]?.star == null"
