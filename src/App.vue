@@ -65,7 +65,7 @@ const addOperator = (operator) => {
   }
 
   if (numbers.value.length === 1 && numbers.value[0] === 24) {
-    gameResult = calResult(health.value, timer, levelSelect.value);
+    gameResult = calResult(health.value, timer.value, levelSelect.value);
     //Update Level
     levelUnlocked++;
     localStorage.setItem("LevelUnlock", levelUnlocked);
@@ -553,8 +553,10 @@ const backToMainMenu = () => {
     >
       <img class="w-[40px]" src="/src/assets/level/rocket.png" />
     </div>
+
     <div
       class="blue-dialog bounce-animation w-[90%] md:w-110 h-50 mt-5 flex flex-col gap-3 justify-center items-center"
+      style="z-index: 100;"
       v-show="showPlay"
     >
       <button
