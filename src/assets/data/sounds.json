@@ -1,0 +1,17 @@
+{
+    "click" : {
+        "path" : "/public/sounds/click.mp3"
+    },
+    "scene0" : {
+        "path" : "/public/sounds/scene1.mp3"
+    },
+    "scene1" : {
+        "path" : "/public/sounds/scene2.mp3"
+    },
+    "scene2" : {
+        "path" : "/public/sounds/scene3.mp3"
+    },
+    "scene3" : {
+        "path" : "/public/sounds/scene4.mp3"
+    }
+}
