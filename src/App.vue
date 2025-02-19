@@ -265,6 +265,7 @@ if (levelUnlocked == null) {
 watch(currentScene, (newValue) => {
   if (newValue !== 1) return;
   createLine(true);
+  playSceneSound(newValue);
 });
 
 function createLine(changeScene = false) {
@@ -398,6 +399,7 @@ const typeTracker = ref(false);
 const soundPlayer = ref(null);
 const soundSource = ref(null);
 const volume = ref(1);
+const openTutorial = ref(false);
 
 const changeStoryScene = (action) => {
   if (typeTracker.value) return;
@@ -456,9 +458,18 @@ const adjustVolume = () => {
   soundManager.setVolume(volume.value);
 };
 
-const playSceneSound = (noSound) => {
-  soundManager.play(`scene${noSound}`);
+const playSceneSound = (noScene) => {
+  soundManager.play(`scene${noScene}`);
 };
+
+const startTutorial = () => {
+  openTutorial.value = true;
+};
+
+const closeTutorial = () => {
+  openTutorial.value = false;
+};
+
 //Tonpee End
 </script>
 
@@ -749,6 +760,24 @@ const playSceneSound = (noSound) => {
     <span>{{ Math.round(volume * 100) }}%</span>
   </div>
 
+  <div v-if="currentScene === 3" class="tutorial-button" @click="startTutorial">
+    TUTORIAL
+  </div>
+  <div
+    v-if="openTutorial"
+    class="tutorial-overlay"
+    @click="closeTutorial"
+  ></div>
+  <div v-if="openTutorial" class="tutorial-box">
+    <div class="tutorial-header">
+      TUTORIAL
+      <span class="tutorial-close" @click="closeTutorial">&times;</span>
+    </div>
+    <div class="tutorial-content">
+      <div>Let's get Start to 24GAME</div>
+      <div v-for="i in 100">empty tutorial</div>
+    </div>
+  </div>
   <!-- Tonpee End -->
   <!-- Chicha Start -->
   <!-- Main Menu -->
@@ -1251,6 +1280,101 @@ div {
   border-radius: 10px;
   color: white;
   text-align: center;
+}
+
+.tutorial-button {
+  position: absolute;
+  top: 20px; /* ระยะห่างจากขอบบน */
+  left: 20px; /* ระยะห่างจากขอบซ้าย */
+  padding: 10px 20px;
+  background: #f6ce09;
+  -webkit-text-stroke: 0.03em #2e1b5b;
+  color: black;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: b 0.3s;
+}
+
+.tutorial-button:hover {
+  background: #b89d18;
+}
+
+.tutorial-box {
+  width: 50vw;
+  height: 60vh;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.tutorial-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tutorial-box::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.tutorial-box::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+}
+
+.tutorial-content {
+  width: 80%;
+  padding: 15px;
+  font-size: 16px;
+  color: #636262;
+}
+
+.tutorial-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.tutorial-close:hover {
+  color: #000;
+}
+
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -55%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
 }
 
 @media (max-width: 480px) {
