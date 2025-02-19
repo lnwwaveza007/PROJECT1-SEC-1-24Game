@@ -1,0 +1,72 @@
+{
+    "0": {
+        "level": 1,
+        "text": "In Numeria, numbers are the life force of everything. They shape reality and govern all existence.",
+        "image": "/story/01.jpg"
+    },
+    "1": {
+        "level": 1,
+        "text": "\"24\" is believed to be the sacred number maintaining universal balance. All of Numeria's laws and customs revolve around this mystical number.",
+        "image": "/story/02.jpg"
+    },
+    "2": {
+        "level": 1,
+        "text": "Four, a young knight with number-control powers, discovers the God of Calculation has shattered into eight pieces. She embarks on a quest to recover these fragments and restore cosmic order.",
+        "image": "/story/03.jpg"
+    },
+    "3": {
+        "level": 1,
+        "text": "Without the God of Calculation, Numeria falls into chaos as numbers lose their power. Reality warps as the sacred \"24\" no longer holds the world together.",
+        "image": "/story/04.jpg"
+    },
+    "4": {
+        "level": 2,
+        "text": "Four enters a village governed by numerical rules and solves math puzzles. Her success earns her the first divine fragment.",
+        "image": "/story/05.jpg"
+    },
+    "5": {
+        "level": 3,
+        "text": "In a twisted forest, Four confronts beasts born from distorted prime numbers. She overcomes these challenges through clever numerical manipulation.",
+        "image": "/story/06.jpg"
+    },
+    "6": {
+        "level": 4,
+        "text": "Four visits a city overrun by multiplication gone wild. By mastering multiplication principles, she tames the numerical chaos and claims another fragment.",
+        "image": "/story/07.jpg"
+    },
+    "7": {
+        "level": 5,
+        "text": "Within a cave of broken fractions, Four brings balance by solving complex ratio puzzles. Her understanding of parts and wholes reveals another divine fragment.",
+        "image": "/story/08.jpg"
+    },
+    "8": {
+        "level": 6,
+        "text": "In a castle ruled by subtraction, Four solves puzzles of loss and diminishment. She gains the next fragment by understanding the value of what remains.",
+        "image": "/story/09.jpg"
+    },
+    "9": {
+        "level": 7,
+        "text": "Crossing a bridge where zero threatens to erase existence, Four harnesses the void's power. She masters nothingness to claim another piece of the God.",
+        "image": "/story/10.jpg"
+    },
+    "10": {
+        "level": 8,
+        "text": "At the tower's peak, Four faces a trial involving the sacred \"24\". She realizes this number is merely a tool of control rather than divine truth.",
+        "image": "/story/11.jpg"
+    },
+    "11": {
+        "level": 8,
+        "text": "The God of Calculation appears among swirling numeric illusions and reveals the truth. The supposedly sacred 24 was merely an instrument to control Numeria's reality.",
+        "image": "/story/12.jpg"
+    },
+    "12": {
+        "level": 8,
+        "text": "Four creates the \"Boundless Number\" using all fragments she collected. This new force restores true balance to Numeria without fixed numerical constraints.",
+        "image": "/story/13.jpg"
+    },
+    "13": {
+        "level": 8,
+        "text": "Freed from the tyranny of \"24\", Numeria finds harmony in numerical diversity. The people discover beauty in imperfection as numbers flow naturally once more.",
+        "image": "/story/14.jpg"
+    }
+}
