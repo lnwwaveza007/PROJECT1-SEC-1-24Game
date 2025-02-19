@@ -340,11 +340,13 @@ function move(event) {
     levelSelect.value = targetLevel;
     // Move Rocket
     showPlay.value = false;
-    var x = event.target.x - 100;
-    var y = event.target.y - 10;
-    var rocket = document.getElementById("rocket");
-    rocket.style.left = x + "px";
-    rocket.style.top = y + "px";
+    var movingTarget = document.getElementById(
+        `Star${starStyles.value.length - levelSelect.value}`
+    );
+    var player = document.getElementById("rocket");
+    player.style.left =
+    movingTarget.getBoundingClientRect().left - 80 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
+    player.style.top = movingTarget.getBoundingClientRect().top + "px";
     setTimeout(() => {
       showPlay.value = true;
     }, 550);
