@@ -68,7 +68,7 @@ const addOperator = (operator) => {
     gameResult = calResult(health.value, timer.value, levelSelect.value);
     //Update Level
     if (levelUnlocked <= levelSelect.value) {
-      noti("You have unlocked new story! check it now ✨", 5000)
+      noti("You have unlocked new story! check it now ✨", 5000);
       levelUnlocked = levelSelect.value + 1;
     }
     localStorage.setItem("LevelUnlock", levelUnlocked);
@@ -187,6 +187,8 @@ const scenes = [
 const changeScene = (id) => {
   if (currentScene.value === id) return;
 
+  typeTracker.value = false;
+
   isTransitioning.value = true;
 
   setTimeout(() => {
@@ -247,8 +249,6 @@ const startGame = () => {
 //Boom Start
 import { lineCreate } from "./utils/lineCreate";
 
-const resize = ref(false);
-
 const showPlay = ref(true);
 
 const levelSelect = ref(1);
@@ -297,8 +297,8 @@ function createLine(changeScene = false) {
       // Move player(rocket) to start
       var player = document.getElementById("rocket");
       var startingPoint = document.getElementById(
-      `Star${starStyles.value.length - levelSelect.value}`
-    );
+        `Star${starStyles.value.length - levelSelect.value}`
+      );
       player.style.left =
         startingPoint.getBoundingClientRect().left - 80 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
       player.style.top = startingPoint.getBoundingClientRect().top + "px";
@@ -313,33 +313,41 @@ window.addEventListener("resize", () => {
 
 //move rocket
 function move(event) {
-  // Level Skip Block
-  const targetLevel =
-    starStyles.value.length - Number(event.target.id.replace("Star", ""));
-  if (
-    targetLevel != levelSelect.value + 1 &&
-    targetLevel != levelSelect.value - 1
-  ) {
-    noti("Hey slow down! only one step each 🪜", 1500);
-    return;
+  let scrollTime = 0;
+  if (window.scrollY !== 0) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollTime = 300;
   }
-  // Check Unlocked Level
-  if (targetLevel > levelUnlocked) {
-    noti("You need to complete the previous level first 🚀", 1500);
-    return;
-  }
-  // Set Selected Level
-  levelSelect.value = targetLevel;
-  // Move Rocket
-  showPlay.value = false;
-  var x = event.target.x - 100;
-  var y = event.target.y - 10;
-  var rocket = document.getElementById("rocket");
-  rocket.style.left = x + "px";
-  rocket.style.top = y + "px";
+  // Fixing Responsive Issue
   setTimeout(() => {
-    showPlay.value = true;
-  }, 550);
+    // Level Skip Block
+    const targetLevel =
+      starStyles.value.length - Number(event.target.id.replace("Star", ""));
+    if (
+      targetLevel != levelSelect.value + 1 &&
+      targetLevel != levelSelect.value - 1
+    ) {
+      noti("Hey slow down! only one step each 🪜", 1500);
+      return;
+    }
+    // Check Unlocked Level
+    if (targetLevel > levelUnlocked) {
+      noti("You need to complete the previous level first 🚀", 1500);
+      return;
+    }
+    // Set Selected Level
+    levelSelect.value = targetLevel;
+    // Move Rocket
+    showPlay.value = false;
+    var x = event.target.x - 100;
+    var y = event.target.y - 10;
+    var rocket = document.getElementById("rocket");
+    rocket.style.left = x + "px";
+    rocket.style.top = y + "px";
+    setTimeout(() => {
+      showPlay.value = true;
+    }, 550);
+  }, scrollTime);
 }
 
 // window.addEventListener("click", move);
@@ -427,8 +435,18 @@ const backToMainMenu = () => {
 
 onMounted(() => {
   soundManager.init(soundPlayer, soundSource);
-  playSceneSound(0);
 });
+
+// Play First Scene Sound
+window.onload = () => {
+  let firstSceneSound = false;
+  window.addEventListener("click", () => {
+    if (!firstSceneSound) {
+      playSceneSound(0);
+      firstSceneSound = true;
+    }
+  });
+};
 
 const clickButton = () => {
   soundManager.play("click");
@@ -446,12 +464,17 @@ const playSceneSound = (noSound) => {
 
 <template>
   <!-- Notification -->
-  <div v-if="notification.show" class="fixed flex justify-center items-center pt-15 lg:pt-5 w-full">
+  <div
+    v-if="notification.show"
+    class="fixed flex justify-center items-center pt-15 lg:pt-5 w-full"
+  >
     <div
       ref="notiElement"
       class="notification flex justify-center items-center py-3 px-5"
     >
-      <p class="text-[6px] min-[376px]:text-[8px] md:text-[12px]">{{ notification.message }}</p>
+      <p class="text-[6px] min-[376px]:text-[8px] md:text-[12px]">
+        {{ notification.message }}
+      </p>
     </div>
   </div>
   <!-- Kong Start -->
@@ -560,7 +583,7 @@ const playSceneSound = (noSound) => {
   <!-- Boom Start -->
   <div
     v-bind:hidden="currentScene !== 1"
-    class="min-h-screen bg-gray-100 flex flex-col items-center justify-center font-sans text-gray-800"
+    class="min-h-screen bg-gray-100 flex flex-col items-center justify-center font-sans text-gray-800 py-5"
     style="
       background-image: url(/src/assets/Background2.png);
       background-size: cover;
@@ -664,7 +687,7 @@ const playSceneSound = (noSound) => {
     >
       <div
         v-if="levelUnlocked >= stories[currentStoryIndex].level"
-        class="story-image-wrapper"
+        class="story-image-wrapper w-[70%] lg:w-[60%]"
       >
         <img :src="stories[currentStoryIndex].image" class="story-image" />
       </div>
@@ -673,7 +696,7 @@ const playSceneSound = (noSound) => {
       </div>
       <p
         v-text="storyText"
-        class="story-text text-[12px] md:text-[14px] lg:text-[16px] xl:text-[18px]"
+        class="story-text text-[12px] md:text-[12px] xl:text-[18px]"
       ></p>
       <div class="button-story-stage">
         <button
@@ -736,7 +759,7 @@ const playSceneSound = (noSound) => {
       background-size: cover;
       background-position: center center;
     "
-    class="h-screen w-screen just flex flex-col items-center pt-50 gap-7"
+    class="h-screen w-screen just flex flex-col items-center pt-[14%] gap-7"
   >
     <h1
       class="text-3xl min-[321px]:text-5xl md:text-6xl text-[#ffd100] pixelFont"
@@ -1102,8 +1125,8 @@ div {
   align-items: center;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   text-align: center;
+  height: 100vh;
   animation: fadeIn 0.5s ease-in-out;
   background-image: url("./assets/story/story-bg.png");
   background-size: cover;
@@ -1129,7 +1152,6 @@ div {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
 }
 
 .story-image {
