@@ -92,6 +92,7 @@ const addOperator = (operator) => {
     localStorage.setItem("levelPassedData", JSON.stringify(levelPassedData));
     //Result Show
     changeScene(4);
+    soundManager.play("win");
   } else if (
     numbers.value.length === 1 &&
     numbers.value[0] !== 24 &&
@@ -99,6 +100,7 @@ const addOperator = (operator) => {
   ) {
     gameResult = { star: -1 };
     changeScene(4);
+    soundManager.play("fail");
   } else {
     message.value = "";
   }
@@ -211,6 +213,7 @@ const startCount = setInterval(() => {
     if (timer.value.left_time <= 0) {
       gameResult = { star: -1 };
       changeScene(4);
+      soundManager.play("fail");
     }
   }
 }, 1000);
@@ -237,6 +240,8 @@ function noti(message, time) {
 }
 
 const startGame = () => {
+  soundManager.play("enter_scene");
+
   //Prepare Game
   health.value.current = 3;
   timer.value.max_time = level[levelSelect.value].time_max;
@@ -265,7 +270,6 @@ if (levelUnlocked == null) {
 watch(currentScene, (newValue) => {
   if (newValue !== 1) return;
   createLine(true);
-  playSceneSound(newValue);
 });
 
 function createLine(changeScene = false) {
@@ -336,16 +340,17 @@ function move(event) {
       noti("You need to complete the previous level first 🚀", 1500);
       return;
     }
+    // Sound play
+    soundManager.play("walk");
     // Set Selected Level
     levelSelect.value = targetLevel;
     // Move Rocket
     showPlay.value = false;
     var movingTarget = document.getElementById(
-        `Star${starStyles.value.length - levelSelect.value}`
+      `Star${starStyles.value.length - levelSelect.value}`
     );
     var player = document.getElementById("rocket");
-    player.style.left =
-    movingTarget.getBoundingClientRect().left - 80 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
+    player.style.left = movingTarget.getBoundingClientRect().left - 80 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
     player.style.top = movingTarget.getBoundingClientRect().top + 10 + "px";
     setTimeout(() => {
       showPlay.value = true;
@@ -400,6 +405,10 @@ const typeTracker = ref(false);
 
 const soundPlayer = ref(null);
 const soundSource = ref(null);
+
+const bgSoundPlayer = ref(null);
+const bgSoundSource = ref(null);
+
 const volume = ref(1);
 const openTutorial = ref(false);
 
@@ -423,7 +432,7 @@ const changeStoryScene = (action) => {
 watch([currentStoryIndex, currentScene], () => {
   const currentStory = stories[currentStoryIndex.value];
   if (levelUnlocked >= currentStory.level) {
-    typeWriter(storyText, currentStory.text, 50, typeTracker);
+    typeWriter(storyText, currentStory.text, 30, typeTracker);
   } else {
     storyText.value =
       "You need to complete the next level to unlock this story";
@@ -438,7 +447,7 @@ const backToMainMenu = () => {
 };
 
 onMounted(() => {
-  soundManager.init(soundPlayer, soundSource);
+  soundManager.init(soundPlayer, soundSource, bgSoundPlayer, bgSoundSource);
 });
 
 // Play First Scene Sound
@@ -446,7 +455,7 @@ window.onload = () => {
   let firstSceneSound = false;
   window.addEventListener("click", () => {
     if (!firstSceneSound) {
-      playSceneSound(0);
+      playSceneSound(3);
       firstSceneSound = true;
     }
   });
@@ -461,7 +470,7 @@ const adjustVolume = () => {
 };
 
 const playSceneSound = (noScene) => {
-  soundManager.play(`scene${noScene}`);
+  soundManager.playBg(`scene${noScene}`);
 };
 
 const startTutorial = () => {
@@ -471,6 +480,12 @@ const startTutorial = () => {
 const closeTutorial = () => {
   openTutorial.value = false;
 };
+
+watch(currentScene, () => {
+  if (currentScene.value !== 4) {
+    playSceneSound(currentScene.value);
+  }
+});
 
 //Tonpee End
 </script>
@@ -640,10 +655,7 @@ const closeTutorial = () => {
     >
       <button
         class="bg-green-600 text-white px-2 rounded-md font-semibold"
-        @click="
-          startGame();
-          clickButton();
-        "
+        @click="startGame()"
       >
         Play
       </button>
@@ -691,6 +703,10 @@ const closeTutorial = () => {
 
   <audio controls ref="soundPlayer" id="soundManager" hidden>
     <source :src="soundSource" type="audio/mp3" />
+  </audio>
+
+  <audio controls ref="bgSoundPlayer" id="soundManager" hidden>
+    <source :src="bgSoundSource" type="audio/mp3" />
   </audio>
 
   <div v-if="currentScene === 2" class="story-container">
