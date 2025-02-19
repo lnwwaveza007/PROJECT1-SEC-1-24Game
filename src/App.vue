@@ -1,6 +1,6 @@
 <script setup>
 //Kong Start
-import { ref, onMounted, computed, watch, watchEffect } from "vue";
+import { ref, onMounted, computed, watch, watchEffect, nextTick } from "vue";
 
 const numbers = ref([]);
 const storeNumbers = ref([]);
@@ -67,7 +67,10 @@ const addOperator = (operator) => {
   if (numbers.value.length === 1 && numbers.value[0] === 24) {
     gameResult = calResult(health.value, timer.value, levelSelect.value);
     //Update Level
-    levelUnlocked++;
+    if (levelUnlocked <= levelSelect.value) {
+      noti("You have unlocked new story! check it now ✨", 5000);
+      levelUnlocked = levelSelect.value + 1;
+    }
     localStorage.setItem("LevelUnlock", levelUnlocked);
     //Update Passed Data
     if (levelPassedData[`${levelSelect.value}`] != null) {
@@ -184,6 +187,8 @@ const scenes = [
 const changeScene = (id) => {
   if (currentScene.value === id) return;
 
+  typeTracker.value = false;
+
   isTransitioning.value = true;
 
   setTimeout(() => {
@@ -210,6 +215,27 @@ const startCount = setInterval(() => {
   }
 }, 1000);
 
+const notification = ref({
+  show: false,
+  message: "",
+});
+
+const notiElement = ref(null);
+
+function noti(message, time) {
+  notification.value.message = message;
+  notification.value.show = true;
+  nextTick(() => {
+    notiElement.value.classList.add("notification-show");
+    setTimeout(() => {
+      notiElement.value.classList.add("notification-dismiss");
+      setTimeout(() => {
+        notification.value.show = false;
+      }, 300);
+    }, time);
+  });
+}
+
 const startGame = () => {
   //Prepare Game
   health.value.current = 3;
@@ -223,8 +249,6 @@ const startGame = () => {
 //Boom Start
 import { lineCreate } from "./utils/lineCreate";
 
-const resize = ref(false);
-
 const showPlay = ref(true);
 
 const levelSelect = ref(1);
@@ -233,6 +257,7 @@ let levelUnlocked = localStorage.getItem("LevelUnlock");
 
 if (levelUnlocked == null) {
   localStorage.setItem("LevelUnlock", 1);
+  levelUnlocked = 1;
 } else {
   levelUnlocked = Number(levelUnlocked);
 }
@@ -273,7 +298,7 @@ function createLine(changeScene = false) {
       // Move player(rocket) to start
       var player = document.getElementById("rocket");
       var startingPoint = document.getElementById(
-        `Star${starStyles.value.length - 1}`
+        `Star${starStyles.value.length - levelSelect.value}`
       );
       player.style.left =
         startingPoint.getBoundingClientRect().left - 80 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
@@ -289,33 +314,41 @@ window.addEventListener("resize", () => {
 
 //move rocket
 function move(event) {
-  // Level Skip Block
-  const targetLevel =
-    starStyles.value.length - Number(event.target.id.replace("Star", ""));
-  if (
-    targetLevel != levelSelect.value + 1 &&
-    targetLevel != levelSelect.value - 1
-  ) {
-    alert("Can't Move To That Star");
-    return;
+  let scrollTime = 0;
+  if (window.scrollY !== 0) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollTime = 300;
   }
-  // Check Unlocked Level
-  if (targetLevel > levelUnlocked) {
-    alert("You need to complete the level in order");
-    return;
-  }
-  // Set Selected Level
-  levelSelect.value = targetLevel;
-  // Move Rocket
-  showPlay.value = false;
-  var x = event.target.x - 100;
-  var y = event.target.y - 10;
-  var rocket = document.getElementById("rocket");
-  rocket.style.left = x + "px";
-  rocket.style.top = y + "px";
+  // Fixing Responsive Issue
   setTimeout(() => {
-    showPlay.value = true;
-  }, 550);
+    // Level Skip Block
+    const targetLevel =
+      starStyles.value.length - Number(event.target.id.replace("Star", ""));
+    if (
+      targetLevel != levelSelect.value + 1 &&
+      targetLevel != levelSelect.value - 1
+    ) {
+      noti("Hey slow down! only one step each 🪜", 1500);
+      return;
+    }
+    // Check Unlocked Level
+    if (targetLevel > levelUnlocked) {
+      noti("You need to complete the previous level first 🚀", 1500);
+      return;
+    }
+    // Set Selected Level
+    levelSelect.value = targetLevel;
+    // Move Rocket
+    showPlay.value = false;
+    var x = event.target.x - 100;
+    var y = event.target.y - 10;
+    var rocket = document.getElementById("rocket");
+    rocket.style.left = x + "px";
+    rocket.style.top = y + "px";
+    setTimeout(() => {
+      showPlay.value = true;
+    }, 550);
+  }, scrollTime);
 }
 
 // window.addEventListener("click", move);
@@ -353,42 +386,27 @@ const health = ref({
 let gameResult;
 //Chicha End
 //Tonpee Start
-import { soundManager } from "@/utils/soundManager.js";
-
-const stories = ref([
-  {
-    id: 1,
-    image: "/storys/story1.webp",
-    text: "Start your adventure.",
-    unlocked: true,
-  },
-  {
-    id: 2,
-    image: "/storys/story2.jpeg",
-    text: "Meet a stranger.",
-    unlocked: false,
-  },
-  {
-    id: 3,
-    image: "/storys/story3.webp",
-    text: "A challenge ahead.",
-    unlocked: false,
-  },
-]);
+import { typeWriter } from "./utils/typeWriter";
+import { soundManager } from "./utils/soundManager";
+import stories from "./assets/data/story";
 
 const currentStoryIndex = ref(0);
 const hiddenNext = ref(false);
 
-const soundPlayer = ref("");
-const soundSource = ref("");
+const storyText = ref("");
+const typeTracker = ref(false);
+
+const soundPlayer = ref(null);
+const soundSource = ref(null);
 const volume = ref(1);
 const openTutorial = ref(false);
 
 const changeStoryScene = (action) => {
+  if (typeTracker.value) return;
   if (action === "next") {
-    if (currentStoryIndex.value < stories.value.length - 1) {
+    if (currentStoryIndex.value < Object.keys(stories).length - 1) {
       currentStoryIndex.value++;
-      if (currentStoryIndex.value === stories.value.length - 1) {
+      if (currentStoryIndex.value === Object.keys(stories).length - 1) {
         hiddenNext.value = true;
       }
     }
@@ -400,16 +418,18 @@ const changeStoryScene = (action) => {
   }
 };
 
-const storyText = computed(() => {
-  const currentStory = stories.value[currentStoryIndex.value];
-  return levelUnlocked >= currentStory.id
-    ? currentStory.text
-    : "You have to clear game stage for unlock";
+watch([currentStoryIndex, currentScene], () => {
+  const currentStory = stories[currentStoryIndex.value];
+  if (levelUnlocked >= currentStory.level) {
+    typeWriter(storyText, currentStory.text, 50, typeTracker);
+  } else {
+    storyText.value =
+      "You need to complete the next level to unlock this story";
+  }
 });
 
 const backToMainMenu = () => {
   if (currentScene.value === 2) {
-    currentStoryIndex.value = 0;
     hiddenNext.value = false;
   }
   changeScene(3);
@@ -417,8 +437,18 @@ const backToMainMenu = () => {
 
 onMounted(() => {
   soundManager.init(soundPlayer, soundSource);
-  // playSceneSound(0);
 });
+
+// Play First Scene Sound
+window.onload = () => {
+  let firstSceneSound = false;
+  window.addEventListener("click", () => {
+    if (!firstSceneSound) {
+      playSceneSound(0);
+      firstSceneSound = true;
+    }
+  });
+};
 
 const clickButton = () => {
   soundManager.play("click");
@@ -444,6 +474,20 @@ const closeTutorial = () => {
 </script>
 
 <template>
+  <!-- Notification -->
+  <div
+    v-if="notification.show"
+    class="fixed flex justify-center items-center pt-15 lg:pt-5 w-full"
+  >
+    <div
+      ref="notiElement"
+      class="notification flex justify-center items-center py-3 px-5"
+    >
+      <p class="text-[6px] min-[376px]:text-[8px] md:text-[12px]">
+        {{ notification.message }}
+      </p>
+    </div>
+  </div>
   <!-- Kong Start -->
   <div
     v-bind:hidden="currentScene !== 0"
@@ -550,7 +594,7 @@ const closeTutorial = () => {
   <!-- Boom Start -->
   <div
     v-bind:hidden="currentScene !== 1"
-    class="min-h-screen bg-gray-100 flex flex-col items-center justify-center font-sans text-gray-800"
+    class="min-h-screen bg-gray-100 flex flex-col items-center justify-center font-sans text-gray-800 py-5"
     style="
       background-image: url(/src/assets/Background2.png);
       background-size: cover;
@@ -601,7 +645,9 @@ const closeTutorial = () => {
       >
         Play
       </button>
-      <p class="text-md">Level : {{ levelSelect }}</p>
+      <p class="text-md px-3 text-[9px] min-[321px]:text-[10px] md:text-sm">
+        {{ level[levelSelect].name }}
+      </p>
       <div class="flex flex-row gap-3 justify-center">
         <img
           v-if="levelPassedData[levelSelect]?.star == null"
@@ -646,17 +692,23 @@ const closeTutorial = () => {
   </audio>
 
   <div v-if="currentScene === 2" class="story-container">
-    <div v-if="stories[currentStoryIndex]" class="story-wrapper">
+    <div
+      v-if="stories[currentStoryIndex]"
+      class="story-wrapper w-[95%] md:w-[90%] lg:w-[80%] xl:w-[60%]"
+    >
       <div
-        v-if="levelUnlocked >= stories[currentStoryIndex].id"
-        class="story-image-wrapper"
+        v-if="levelUnlocked >= stories[currentStoryIndex].level"
+        class="story-image-wrapper w-[70%] lg:w-[60%]"
       >
         <img :src="stories[currentStoryIndex].image" class="story-image" />
       </div>
-      <div v-else class="story-wrapper story-lock-wrapper">
+      <div v-else class="story-lock-wrapper h-50">
         <img src="/public/icons/lock.png" class="lock-icon" />
       </div>
-      <p class="story-text">{{ storyText }}</p>
+      <p
+        v-text="storyText"
+        class="story-text text-[12px] md:text-[12px] xl:text-[18px]"
+      ></p>
       <div class="button-story-stage">
         <button
           @click="
@@ -736,7 +788,7 @@ const closeTutorial = () => {
       background-size: cover;
       background-position: center center;
     "
-    class="h-screen w-screen just flex flex-col items-center pt-50 gap-7"
+    class="h-screen w-screen just flex flex-col items-center pt-[14%] gap-7"
   >
     <h1
       class="text-3xl min-[321px]:text-5xl md:text-6xl text-[#ffd100] pixelFont"
@@ -982,6 +1034,39 @@ div {
 /* Kong Start */
 /* Kong End */
 /* Wave Start */
+.notification {
+  border-image: url("./assets/main-game/24game/dialog-bg.png");
+  border-image-slice: 13 fill;
+  border-image-width: 30px;
+  border-image-repeat: repeat;
+}
+
+.notification-show {
+  animation: popUp 0.3s ease-out forwards;
+}
+
+.notification-dismiss {
+  animation: popDown 0.3s ease-out forwards;
+}
+
+@keyframes popDown {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes popUp {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 @keyframes fadeUptoDown {
   0% {
     clip-path: inset(0 0 100% 0);
@@ -1068,12 +1153,14 @@ div {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 90%;
-  max-width: 600px;
-  margin: 0 auto;
+  align-items: center;
   text-align: center;
-  min-height: 500px;
+  height: 100vh;
   animation: fadeIn 0.5s ease-in-out;
+  background-image: url("./assets/story/story-bg.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .story-wrapper {
@@ -1081,24 +1168,24 @@ div {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
   min-height: 250px;
-  padding: 20px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 50px;
+  gap: 5px;
+  border-image: url("./assets/main-game/24game/dialog-bg.png");
+  border-image-slice: 13 fill;
+  border-image-width: 30px;
+  border-image-repeat: repeat;
 }
 
 .story-image-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
 }
 
 .story-image {
   width: 100%;
-  max-width: 350px;
+  max-width: 600px;
   height: auto;
   border-radius: 8px;
   transition: transform 0.3s ease-in-out;
@@ -1115,8 +1202,6 @@ div {
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 100%;
-  padding: 20px;
   border-radius: 12px;
 }
 
@@ -1131,10 +1216,8 @@ div {
 }
 
 .story-text {
-  font-size: 1.2rem;
   margin-top: 20px;
   color: #222;
-  font-weight: bold;
 }
 
 .button-story-stage {
@@ -1297,9 +1380,6 @@ div {
 @media (max-width: 480px) {
   .story-container {
     min-height: 400px;
-  }
-  .story-text {
-    font-size: 1rem;
   }
   .story-button,
   .back-story-button {
