@@ -484,7 +484,7 @@ const closeTutorial = () => {
 watch(currentScene, () => {
   if (currentScene.value !== 4) {
     playSceneSound(currentScene.value);
-  }else {
+  } else {
     soundManager.stopBg();
   }
 });
@@ -780,9 +780,6 @@ watch(currentScene, () => {
     <span>{{ Math.round(volume * 100) }}%</span>
   </div>
 
-  <div v-if="currentScene === 3" class="tutorial-button" @click="startTutorial">
-    TUTORIAL
-  </div>
   <div
     v-if="openTutorial"
     class="tutorial-overlay"
@@ -794,8 +791,92 @@ watch(currentScene, () => {
       <span class="tutorial-close" @click="closeTutorial">&times;</span>
     </div>
     <div class="tutorial-content">
-      <div>Let's get Start to 24GAME</div>
-      <div v-for="i in 100">empty tutorial</div>
+      <h1 class="text-white text-lg">👋 Hello Welcome to 24Game !!!</h1>
+      <p>So how to play this game?</p>
+      <p>
+        First in the main menu you can choose to play the game, read the story
+        or read the tutorial (You are here now 🤣)
+      </p>
+      <img src="./assets/tutorial/01.png" class="rounded-md w-200 p-5" />
+      <p>If you click the start button you will move to the level selection</p>
+      <img src="./assets/tutorial/02.png" class="rounded-md w-100 p-5" />
+      <p>
+        Otherwise, if you click the story button you will move to the story room
+      </p>
+      <img src="./assets/tutorial/03.png" class="rounded-md w-100 p-5" />
+      <p>
+        I suggest you to read the story first before playing the game (We make
+        it from our heart 💖)
+      </p>
+      <img src="./assets/tutorial/plead.png" class="rounded-md w-70 p-5" />
+      <p>
+        Also we got volume control for you so you can adjust the volume to your
+        preference
+      </p>
+      <img src="./assets/tutorial/04.png" class="rounded-md w-100 p-5" />
+      <h1 class="text-white text-lg">📜 Story</h1>
+      <p>
+        In story page you can read the story of each level that you have
+        unlocked
+      </p>
+      <img src="./assets/tutorial/05.png" class="rounded-md w-200 p-5" />
+      <p>You can click next and back button to read the story of each level</p>
+      <img src="./assets/tutorial/06.png" class="rounded-md w-100 p-5" />
+      <p>
+        If you see this scene it means you need to complete the previous level
+        to unlock this story
+      </p>
+      <img src="./assets/tutorial/07.png" class="rounded-md w-100 p-5" />
+      <h1 class="text-white text-lg">🌟 Level Selection</h1>
+      <p>In level selection you can choose the level that you want to play</p>
+      <img src="./assets/tutorial/08.png" class="rounded-md w-200 p-5" />
+      <p>You need to play in order from the first level to the last level</p>
+      <p>
+        You can click on these skull to move to the level that you want to play
+        (if you have unlocked it)
+      </p>
+      <img src="./assets/tutorial/09.png" class="rounded-md w-100 p-5" />
+      <p>
+        you can only move to the next level or the previous level (Can't skip
+        walk 🚶‍♂️)
+      </p>
+      <img src="./assets/tutorial/10.png" class="rounded-md w-100 p-5" />
+      <p>
+        If you're the compentitive person we also have your record time and star
+        for each level
+      </p>
+      <img src="./assets/tutorial/11.png" class="rounded-md w-100 p-5" />
+      <p>So if you ready let's click the play button and start the game</p>
+      <h1 class="text-white text-lg">🎮 Game</h1>
+      <p>24 game is a game that you need to calculate the number to get 24</p>
+      <img src="./assets/tutorial/12.png" class="rounded-md w-200 p-5" />
+      <p>
+        You can select 2 numbers and choose the operator to calculate the number
+      </p>
+      <img src="./assets/tutorial/13.png" class="rounded-md w-100 p-5" />
+      <p>
+        If you can't calculate the number you can revert the number but be
+        careful you only have 3 chances
+      </p>
+      <img src="./assets/tutorial/15.png" class="rounded-md w-100 p-5" />
+      <img src="./assets/tutorial/14.png" class="rounded-md w-100 p-5" />
+      <p>
+        If you get the number 24 you will pass the level and we will show you
+        the result (How good you are 🫵)
+      </p>
+      <img src="./assets/tutorial/17.png" class="rounded-md w-100 p-5" />
+      <p>
+        But!! if you can't calculate the number and lose all your health you
+        will fail the level
+      </p>
+      <img src="./assets/tutorial/16.png" class="rounded-md w-100 p-5" />
+      <p>Or!! if you run out of time you will also fail the level</p>
+      <img src="./assets/tutorial/18.png" class="rounded-md w-100 p-5" />
+      <h1 class="text-white text-lg">🎉 That's all</h1>
+      <p>
+        We hope you enjoy our game and have a good time playing it. If you have
+        any feedback or suggestion please let us know
+      </p>
     </div>
   </div>
   <!-- Tonpee End -->
@@ -865,6 +946,33 @@ watch(currentScene, () => {
       </h2>
       <span
         v-show="MainMenuhover === 'storyBtn'"
+        class="text-[#ffd100]"
+        style="-webkit-text-stroke: 0.07em #2e1b5b"
+        >◀</span
+      >
+    </div>
+    <div
+      class="cursor-pointer font-serif flex flex-row text-4xl justify-center items-center gap-7 z-10"
+      @mouseover="hoverBtn($event, true)"
+      @mouseleave="hoverBtn($event, false)"
+      @click="startTutorial"
+    >
+      <span
+        v-show="MainMenuhover === 'tutorialBtn'"
+        class="text-[#ffd100]"
+        style="-webkit-text-stroke: 0.07em #2e1b5b"
+        >▶</span
+      >
+      <h2
+        id="tutorialBtn"
+        class="text-4xl text-[#ffd100]"
+        style="-webkit-text-stroke: 0.07em #2e1b5b"
+        @click="clickButton"
+      >
+        Tutorial
+      </h2>
+      <span
+        v-show="MainMenuhover === 'tutorialBtn'"
         class="text-[#ffd100]"
         style="-webkit-text-stroke: 0.07em #2e1b5b"
         >◀</span
@@ -1324,8 +1432,8 @@ div {
 }
 
 .tutorial-box {
-  width: 50vw;
-  height: 60vh;
+  width: 90%;
+  height: 90%;
   background: rgba(0, 0, 0, 0.8);
   color: white;
   position: fixed;
@@ -1354,10 +1462,20 @@ div {
 }
 
 .tutorial-content {
-  width: 80%;
   padding: 15px;
   font-size: 16px;
   color: #636262;
+}
+
+.tutorial-content h1 {
+  font-size: 1.5rem;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.tutorial-content p {
+  margin-bottom: 10px;
+  color: rgb(163, 163, 163);
 }
 
 .tutorial-close {
