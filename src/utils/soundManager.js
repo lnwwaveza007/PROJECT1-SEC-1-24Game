@@ -31,11 +31,14 @@ export const soundManager = {
         }
     },
 
-    stop(name) {
-        if (sounds[name]) {
-            soundPlayer.value.pause();
-            soundPlayer.value.currentTime = 0;
-        }
+    stop() {
+        soundPlayer.value.pause();
+        soundPlayer.value.currentTime = 0;
+    },
+
+    stopBg() {
+        bgSoundPlayer.value.pause();
+        bgSoundPlayer.value.currentTime = 0;
     },
 
     setVolume(volume) {
