@@ -484,6 +484,8 @@ const closeTutorial = () => {
 watch(currentScene, () => {
   if (currentScene.value !== 4) {
     playSceneSound(currentScene.value);
+  }else {
+    soundManager.stopBg();
   }
 });
 
