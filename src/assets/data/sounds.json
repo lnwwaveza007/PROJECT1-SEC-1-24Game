@@ -13,5 +13,17 @@
     },
     "scene3" : {
         "path" : "/public/sounds/scene3.mp3"
+    },
+    "walk" : {
+        "path" : "/public/sounds/walk.mp3"
+    },
+    "enter_scene": {
+        "path": "/public/sounds/enter_scene.mp3"
+    },
+    "win": {
+        "path": "/public/sounds/win.mp3"
+    },
+    "fail": {
+        "path": "/public/sounds/fail.mp3"
     }
 }
