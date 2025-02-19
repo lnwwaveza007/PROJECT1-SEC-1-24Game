@@ -346,7 +346,7 @@ function move(event) {
     var player = document.getElementById("rocket");
     player.style.left =
     movingTarget.getBoundingClientRect().left - 80 + "px"; //ดึงตำแหน่งที่แสดงบนหน้าจอ
-    player.style.top = movingTarget.getBoundingClientRect().top + "px";
+    player.style.top = movingTarget.getBoundingClientRect().top + 10 + "px";
     setTimeout(() => {
       showPlay.value = true;
     }, 550);
