@@ -47,7 +47,7 @@
 | 045  | - ออกแบบ logic และหน้า story | - ทำหน้า story พร้อมทั้งระบบ next story | - แก้ไข path and next story method | - ทำระบบ check localStorage เพื่อสร้างเงื่อนไขในการแสดง story เมืื่อ unlocked |
 
 ## Features
-- ** เว็บไซต์ของเรามี Responsive ด้วยนะครับ **
+### เว็บไซต์ของเรามี Responsive ด้วยนะครับ ✨✨
 - ตัวเกมของเราจะแบ่งออกเป็น 5 ส่วนหลักๆ
   - Main Menu
   - ![alt text](docs/features/feature-01.png)
